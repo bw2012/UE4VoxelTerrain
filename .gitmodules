@@ -1,0 +1,3 @@
+[submodule "UE4VoxelTerrain/Plugins/UnrealSandboxTerrain"]
+	path = UE4VoxelTerrain/Plugins/UnrealSandboxTerrain
+	url = https://github.com/bw2012/UnrealSandboxTerrain.git
