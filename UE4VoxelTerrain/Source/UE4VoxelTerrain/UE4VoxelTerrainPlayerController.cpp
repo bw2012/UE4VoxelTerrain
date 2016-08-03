@@ -3,6 +3,7 @@
 #include "UE4VoxelTerrain.h"
 #include "UE4VoxelTerrainPlayerController.h"
 #include "AI/Navigation/NavigationSystem.h"
+#include "SandboxTerrainController.h"
 
 AUE4VoxelTerrainPlayerController::AUE4VoxelTerrainPlayerController()
 {
@@ -32,6 +33,8 @@ void AUE4VoxelTerrainPlayerController::SetupInputComponent()
 	// support touch devices 
 	InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AUE4VoxelTerrainPlayerController::MoveToTouchLocation);
 	InputComponent->BindTouch(EInputEvent::IE_Repeat, this, &AUE4VoxelTerrainPlayerController::MoveToTouchLocation);
+
+	InputComponent->BindAction("Test", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::test);
 }
 
 void AUE4VoxelTerrainPlayerController::MoveToMouseCursor()
@@ -87,4 +90,18 @@ void AUE4VoxelTerrainPlayerController::OnSetDestinationReleased()
 {
 	// clear flag to indicate we should stop updating the destination
 	bMoveToMouseCursor = false;
+}
+
+void AUE4VoxelTerrainPlayerController::test()
+{
+	FHitResult Hit;
+	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+
+	if (Hit.bBlockingHit)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("test point -> %f %f %f"), Hit.ImpactPoint.X, Hit.ImpactPoint.Y, Hit.ImpactPoint.Z);
+		ASandboxTerrainController::digTerrainRoundHole(Hit.ImpactPoint, 80, 5);
+	}
+
+
 }
