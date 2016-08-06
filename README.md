@@ -12,4 +12,10 @@ Contains:
 * memory leaks
 * unfinished code
 
+# Usage
+1. git clone https://github.com/bw2012/UE4VoxelTerrain.git
+2. git submodule update
+3. open project with Unreal Engine 4
+
+# License
 MIT license
