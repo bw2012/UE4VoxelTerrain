@@ -9,6 +9,7 @@ AUE4VoxelTerrainPlayerController::AUE4VoxelTerrainPlayerController()
 {
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
+	tool_mode = 1;
 }
 
 void AUE4VoxelTerrainPlayerController::PlayerTick(float DeltaTime)
@@ -35,6 +36,8 @@ void AUE4VoxelTerrainPlayerController::SetupInputComponent()
 	InputComponent->BindTouch(EInputEvent::IE_Repeat, this, &AUE4VoxelTerrainPlayerController::MoveToTouchLocation);
 
 	InputComponent->BindAction("Test", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::test);
+	InputComponent->BindAction("1", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::setTool1);
+	InputComponent->BindAction("2", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::setTool2);
 }
 
 void AUE4VoxelTerrainPlayerController::MoveToMouseCursor()
@@ -100,8 +103,23 @@ void AUE4VoxelTerrainPlayerController::test()
 	if (Hit.bBlockingHit)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("test point -> %f %f %f"), Hit.ImpactPoint.X, Hit.ImpactPoint.Y, Hit.ImpactPoint.Z);
-		ASandboxTerrainController::digTerrainRoundHole(Hit.ImpactPoint, 80, 5);
+
+		if (tool_mode == 1) {
+			ASandboxTerrainController::digTerrainRoundHole(Hit.ImpactPoint, 80, 5);
+		}
+
+		if (tool_mode == 2) {
+			ASandboxTerrainController::digTerrainCubeHole(Hit.ImpactPoint, 110, 5);
+		}
 	}
+}
 
+void AUE4VoxelTerrainPlayerController::setTool1()
+{
+	tool_mode = 1;
+}
 
+void AUE4VoxelTerrainPlayerController::setTool2()
+{
+	tool_mode = 2;
 }

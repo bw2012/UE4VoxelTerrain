@@ -2,8 +2,10 @@
 
 #include "UE4VoxelTerrain.h"
 #include "UE4VoxelTerrainCharacter.h"
+#include "UE4VoxelTerrainPlayerController.h"
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
+#include "DrawDebugHelpers.h"
 
 AUE4VoxelTerrainCharacter::AUE4VoxelTerrainCharacter()
 {
@@ -50,6 +52,27 @@ AUE4VoxelTerrainCharacter::AUE4VoxelTerrainCharacter()
 	PrimaryActorTick.bStartWithTickEnabled = true;
 }
 
+void drawSelection(UWorld* w, FVector v) {
+	static const float s = 105;
+	static const float t = 3;
+	static const FColor clr(255, 255, 255, 100);
+
+	DrawDebugLine(w, FVector(v.X - s, v.Y - s, v.Z + s), FVector(v.X + s, v.Y - s, v.Z + s), clr, false, -1, 0, t);
+	DrawDebugLine(w, FVector(v.X + s, v.Y - s, v.Z + s), FVector(v.X + s, v.Y + s, v.Z + s), clr, false, -1, 0, t);
+	DrawDebugLine(w, FVector(v.X + s, v.Y + s, v.Z + s), FVector(v.X - s, v.Y + s, v.Z + s), clr, false, -1, 0, t);
+	DrawDebugLine(w, FVector(v.X - s, v.Y + s, v.Z + s), FVector(v.X - s, v.Y - s, v.Z + s), clr, false, -1, 0, t);
+
+	DrawDebugLine(w, FVector(v.X - s, v.Y - s, v.Z - s), FVector(v.X + s, v.Y - s, v.Z - s), clr, false, -1, 0, t);
+	DrawDebugLine(w, FVector(v.X + s, v.Y - s, v.Z - s), FVector(v.X + s, v.Y + s, v.Z - s), clr, false, -1, 0, t);
+	DrawDebugLine(w, FVector(v.X + s, v.Y + s, v.Z - s), FVector(v.X - s, v.Y + s, v.Z - s), clr, false, -1, 0, t);
+	DrawDebugLine(w, FVector(v.X - s, v.Y + s, v.Z - s), FVector(v.X - s, v.Y - s, v.Z - s), clr, false, -1, 0, t);
+
+	DrawDebugLine(w, FVector(v.X - s, v.Y - s, v.Z - s), FVector(v.X - s, v.Y - s, v.Z + s), clr, false, -1, 0, t);
+	DrawDebugLine(w, FVector(v.X + s, v.Y - s, v.Z - s), FVector(v.X + s, v.Y - s, v.Z + s), clr, false, -1, 0, t);
+	DrawDebugLine(w, FVector(v.X + s, v.Y + s, v.Z - s), FVector(v.X + s, v.Y + s, v.Z + s), clr, false, -1, 0, t);
+	DrawDebugLine(w, FVector(v.X - s, v.Y + s, v.Z - s), FVector(v.X - s, v.Y + s, v.Z + s), clr, false, -1, 0, t);
+}
+
 void AUE4VoxelTerrainCharacter::Tick(float DeltaSeconds)
 {
 	if (CursorToWorld != nullptr)
@@ -62,6 +85,18 @@ void AUE4VoxelTerrainCharacter::Tick(float DeltaSeconds)
 			FRotator CursorR = CursorFV.Rotation();
 			CursorToWorld->SetWorldLocation(TraceHitResult.Location);
 			CursorToWorld->SetWorldRotation(CursorR);
+
+			AUE4VoxelTerrainPlayerController* controller = Cast<AUE4VoxelTerrainPlayerController>(GetController());
+
+			if (controller -> tool_mode == 1) {
+				DrawDebugSphere(GetWorld(), TraceHitResult.Location, 80, 24, FColor(255, 255, 255, 100));
+			}
+
+			if (controller->tool_mode == 2) {
+				drawSelection(GetWorld(), TraceHitResult.Location);
+			}
+
+
 		}
 	}
 }
