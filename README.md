@@ -9,11 +9,6 @@ Tested with Unreal Engine 4.14
 
 Work in progress.
 
-Contains:
-* bugs
-* memory leaks
-* unfinished code
-
 # Usage
 1. git clone https://github.com/bw2012/UE4VoxelTerrain.git
 2. git submodule update
