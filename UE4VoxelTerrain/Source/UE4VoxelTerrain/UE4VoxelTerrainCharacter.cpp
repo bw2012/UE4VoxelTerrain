@@ -52,27 +52,6 @@ AUE4VoxelTerrainCharacter::AUE4VoxelTerrainCharacter()
 	PrimaryActorTick.bStartWithTickEnabled = true;
 }
 
-void drawSelection(UWorld* w, FVector v) {
-	static const float s = 105;
-	static const float t = 3;
-	static const FColor clr(255, 255, 255, 100);
-
-	DrawDebugLine(w, FVector(v.X - s, v.Y - s, v.Z + s), FVector(v.X + s, v.Y - s, v.Z + s), clr, false, -1, 0, t);
-	DrawDebugLine(w, FVector(v.X + s, v.Y - s, v.Z + s), FVector(v.X + s, v.Y + s, v.Z + s), clr, false, -1, 0, t);
-	DrawDebugLine(w, FVector(v.X + s, v.Y + s, v.Z + s), FVector(v.X - s, v.Y + s, v.Z + s), clr, false, -1, 0, t);
-	DrawDebugLine(w, FVector(v.X - s, v.Y + s, v.Z + s), FVector(v.X - s, v.Y - s, v.Z + s), clr, false, -1, 0, t);
-
-	DrawDebugLine(w, FVector(v.X - s, v.Y - s, v.Z - s), FVector(v.X + s, v.Y - s, v.Z - s), clr, false, -1, 0, t);
-	DrawDebugLine(w, FVector(v.X + s, v.Y - s, v.Z - s), FVector(v.X + s, v.Y + s, v.Z - s), clr, false, -1, 0, t);
-	DrawDebugLine(w, FVector(v.X + s, v.Y + s, v.Z - s), FVector(v.X - s, v.Y + s, v.Z - s), clr, false, -1, 0, t);
-	DrawDebugLine(w, FVector(v.X - s, v.Y + s, v.Z - s), FVector(v.X - s, v.Y - s, v.Z - s), clr, false, -1, 0, t);
-
-	DrawDebugLine(w, FVector(v.X - s, v.Y - s, v.Z - s), FVector(v.X - s, v.Y - s, v.Z + s), clr, false, -1, 0, t);
-	DrawDebugLine(w, FVector(v.X + s, v.Y - s, v.Z - s), FVector(v.X + s, v.Y - s, v.Z + s), clr, false, -1, 0, t);
-	DrawDebugLine(w, FVector(v.X + s, v.Y + s, v.Z - s), FVector(v.X + s, v.Y + s, v.Z + s), clr, false, -1, 0, t);
-	DrawDebugLine(w, FVector(v.X - s, v.Y + s, v.Z - s), FVector(v.X - s, v.Y + s, v.Z + s), clr, false, -1, 0, t);
-}
-
 void AUE4VoxelTerrainCharacter::Tick(float DeltaSeconds)
 {
 	if (CursorToWorld != nullptr)
@@ -93,7 +72,7 @@ void AUE4VoxelTerrainCharacter::Tick(float DeltaSeconds)
 			}
 
 			if (controller->tool_mode == 2) {
-				drawSelection(GetWorld(), TraceHitResult.Location);
+				DrawDebugBox(GetWorld(), TraceHitResult.Location, FVector(105), FColor(255, 255, 255, 100));
 			}
 
 

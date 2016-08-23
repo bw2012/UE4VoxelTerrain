@@ -9,7 +9,8 @@
 			"Type": "Runtime",
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
-				"UnrealSandboxTerrain"
+				"UnrealSandboxTerrain",
+				"Engine"
 			]
 		}
 	]
