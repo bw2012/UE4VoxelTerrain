@@ -5,7 +5,7 @@ Unreal Engine 4 voxel terrian example
 
 Demo video - https://www.youtube.com/watch?v=Z__-wuxeUsI
 
-Tested with Unreal Engine 4.14
+Tested with Unreal Engine 4.12
 
 Work in progress.
 
