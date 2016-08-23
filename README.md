@@ -1,11 +1,11 @@
 # UE4VoxelTerrain
 Unreal Engine 4 voxel terrian example
 
+**Tested with Unreal Engine 4.12**
+
 ![Unreal Engine 4 voxel terrian](http://media.indiedb.com/images/games/1/51/50197/ezgif.com-video-to-gif_2.gif)
 
 Demo video - https://www.youtube.com/watch?v=Z__-wuxeUsI
-
-Tested with Unreal Engine 4.12
 
 Work in progress.
 
