@@ -5,7 +5,7 @@
 
 
 SandboxVoxelGenerator ATerrainController::newTerrainGenerator(VoxelData &voxel_data) {
-	UE_LOG(LogTemp, Warning, TEXT("terrain generator override"));
+	//UE_LOG(LogTemp, Warning, TEXT("terrain generator override"));
 	return ASandboxTerrainController::newTerrainGenerator(voxel_data);
 }
 
