@@ -103,13 +103,17 @@ void AUE4VoxelTerrainPlayerController::test()
 	if (Hit.bBlockingHit)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("test point -> %f %f %f"), Hit.ImpactPoint.X, Hit.ImpactPoint.Y, Hit.ImpactPoint.Z);
+		
+		// TODO: check controller
+		ASandboxTerrainController* controller = ASandboxTerrainController::GetZoneInstance(Hit.Actor.Get());
+		if (controller != NULL) {
+			if (tool_mode == 1) {
+				controller->digTerrainRoundHole(Hit.ImpactPoint, 80, 5);
+			}
 
-		if (tool_mode == 1) {
-			ASandboxTerrainController::digTerrainRoundHole(Hit.ImpactPoint, 80, 5);
-		}
-
-		if (tool_mode == 2) {
-			ASandboxTerrainController::digTerrainCubeHole(Hit.ImpactPoint, 110, 5);
+			if (tool_mode == 2) {
+				controller->digTerrainCubeHole(Hit.ImpactPoint, 110, 5);
+			}
 		}
 	}
 }
