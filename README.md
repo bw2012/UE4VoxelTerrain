@@ -10,9 +10,13 @@ Demo video - https://www.youtube.com/watch?v=Z__-wuxeUsI
 Work in progress.
 
 # Usage
-1. git clone --recursive https://github.com/bw2012/UE4VoxelTerrain.git
+1. git clone --recursive https://github.com/bw2012/UE4VoxelTerrain.git 
 2. cd UE4VoxelTerrain
 5. open project with Unreal Engine 4
+
+# Download
+**Link to download last stable version 0.0.1** 
+http://bit.ly/2eP5GtU
 
 # License
 MIT license
