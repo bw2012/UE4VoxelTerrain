@@ -8,6 +8,8 @@
 #include "Runtime/UMG/Public/IUMGModule.h"
 #include "Runtime/UMG/Public/Blueprint/UserWidget.h"
 
+#include "TerrainController.h"
+
 #include "Blueprint/UserWidget.h"
 #include "SystemInfoWidget.generated.h"
 
@@ -29,5 +31,9 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "SandboxHUD")
 	ESlateVisibility sandboxSystemInfoVisiblity();
 	
+private:
+	ATerrainController* controller;
+
+	ATerrainController* getController();
 	
 };

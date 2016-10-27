@@ -16,5 +16,14 @@ class UE4VOXELTERRAIN_API ATerrainController : public ASandboxTerrainController
 	
 public:
 	virtual SandboxVoxelGenerator newTerrainGenerator(VoxelData &voxel_data) override;
+
+	int32 ZoneLoaderConter = 0;
+	int32 ZoneLoaderTotal = 0;
+
+protected:
+
+	virtual void OnLoadZoneProgress(int progress, int total) override;
+
+	virtual void OnLoadZoneListFinished() override;
 	
 };
