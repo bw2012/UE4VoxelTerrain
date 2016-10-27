@@ -47,7 +47,7 @@ void ASandboxCharacter::ZoomIn() {
 
 void ASandboxCharacter::ZoomOut() {
 	if (GetCameraBoom() == NULL) return;
-	if (GetCameraBoom()->TargetArmLength < 1500) {
+	if (GetCameraBoom()->TargetArmLength < 2500) {
 		GetCameraBoom()->TargetArmLength += 100;
 	}
 

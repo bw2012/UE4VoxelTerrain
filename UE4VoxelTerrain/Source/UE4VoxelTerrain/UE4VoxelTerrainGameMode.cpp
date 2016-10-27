@@ -4,6 +4,7 @@
 #include "UE4VoxelTerrainGameMode.h"
 #include "UE4VoxelTerrainPlayerController.h"
 #include "UE4VoxelTerrainCharacter.h"
+#include "MainHUD.h"
 
 AUE4VoxelTerrainGameMode::AUE4VoxelTerrainGameMode()
 {
@@ -16,4 +17,6 @@ AUE4VoxelTerrainGameMode::AUE4VoxelTerrainGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
+
+	HUDClass = AMainHUD::StaticClass();
 }
