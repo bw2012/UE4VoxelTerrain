@@ -10,7 +10,8 @@
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
 				"UnrealSandboxTerrain",
-				"Engine"
+				"Engine",
+				"UMG"
 			]
 		}
 	]
