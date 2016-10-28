@@ -4,6 +4,7 @@
 #include "UE4VoxelTerrainPlayerController.h"
 #include "AI/Navigation/NavigationSystem.h"
 #include "SandboxTerrainController.h"
+#include "SandboxCharacter.h"
 
 AUE4VoxelTerrainPlayerController::AUE4VoxelTerrainPlayerController()
 {
@@ -32,12 +33,13 @@ void AUE4VoxelTerrainPlayerController::SetupInputComponent()
 	InputComponent->BindAction("SetDestination", IE_Released, this, &AUE4VoxelTerrainPlayerController::OnSetDestinationReleased);
 
 	// support touch devices 
-	InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AUE4VoxelTerrainPlayerController::MoveToTouchLocation);
-	InputComponent->BindTouch(EInputEvent::IE_Repeat, this, &AUE4VoxelTerrainPlayerController::MoveToTouchLocation);
+	//InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AUE4VoxelTerrainPlayerController::MoveToTouchLocation);
+	//InputComponent->BindTouch(EInputEvent::IE_Repeat, this, &AUE4VoxelTerrainPlayerController::MoveToTouchLocation);
 
 	InputComponent->BindAction("Test", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::test);
 	InputComponent->BindAction("1", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::setTool1);
 	InputComponent->BindAction("2", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::setTool2);
+	InputComponent->BindAction("ToggleView", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::ToggleView);
 }
 
 void AUE4VoxelTerrainPlayerController::MoveToMouseCursor()
@@ -85,18 +87,34 @@ void AUE4VoxelTerrainPlayerController::SetNewMoveDestination(const FVector DestL
 
 void AUE4VoxelTerrainPlayerController::OnSetDestinationPressed()
 {
+
+	ASandboxCharacter* pawn = Cast<ASandboxCharacter>(GetCharacter());
+	if (pawn->view != PlayerView::TOP_DOWN) {
+		return;
+	}
+
 	// set flag to keep updating destination until released
 	bMoveToMouseCursor = true;
 }
 
 void AUE4VoxelTerrainPlayerController::OnSetDestinationReleased()
 {
+	ASandboxCharacter* pawn = Cast<ASandboxCharacter>(GetCharacter());
+	if (pawn->view != PlayerView::TOP_DOWN) {
+		return;
+	}
+
 	// clear flag to indicate we should stop updating the destination
 	bMoveToMouseCursor = false;
 }
 
 void AUE4VoxelTerrainPlayerController::test()
 {
+	ASandboxCharacter* pawn = Cast<ASandboxCharacter>(GetCharacter());
+	if (pawn->view != PlayerView::TOP_DOWN) {
+		return;
+	}
+
 	FHitResult Hit;
 	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
 
@@ -126,4 +144,23 @@ void AUE4VoxelTerrainPlayerController::setTool1()
 void AUE4VoxelTerrainPlayerController::setTool2()
 {
 	tool_mode = 2;
+}
+
+void AUE4VoxelTerrainPlayerController::ToggleView() {
+	ASandboxCharacter* pawn = Cast<ASandboxCharacter>(GetCharacter());
+
+	if (pawn->view == PlayerView::TOP_DOWN) {
+		pawn->initThirdPersonView();
+		bShowMouseCursor = false;
+		pawn->view = PlayerView::THIRD_PERSON;
+		//hud->openTpvHud();
+		//disableZCut();
+	} else if (pawn->view == PlayerView::THIRD_PERSON) {
+		pawn->initTopDownView();
+		bShowMouseCursor = true;
+		pawn->view = PlayerView::TOP_DOWN;
+
+		//hud->closeTpvHud();
+		//z_cut_context.force_check = true;
+	} 
 }

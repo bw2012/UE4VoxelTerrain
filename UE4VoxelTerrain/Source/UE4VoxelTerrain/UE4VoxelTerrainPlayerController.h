@@ -3,6 +3,7 @@
 #include "GameFramework/PlayerController.h"
 #include "UE4VoxelTerrainPlayerController.generated.h"
 
+
 UCLASS()
 class AUE4VoxelTerrainPlayerController : public APlayerController
 {
@@ -42,7 +43,11 @@ private:
 	void test();
 	
 	void setTool1();
+
 	void setTool2();
+
+	void ToggleView();
+
 };
 
 

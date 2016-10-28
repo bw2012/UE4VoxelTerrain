@@ -17,24 +17,16 @@ AUE4VoxelTerrainCharacter::AUE4VoxelTerrainCharacter()
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
-	// Configure character movement
-	GetCharacterMovement()->bOrientRotationToMovement = true; // Rotate character to moving direction
-	GetCharacterMovement()->RotationRate = FRotator(0.f, 640.f, 0.f);
-	GetCharacterMovement()->bConstrainToPlane = true;
-	GetCharacterMovement()->bSnapToPlaneAtStart = true;
 
-	// Create a camera boom...
+	//GetMesh()->AttachParent = RootComponent;
+
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->AttachTo(RootComponent);
-	CameraBoom->bAbsoluteRotation = true; // Don't want arm to rotate when character does
-	CameraBoom->TargetArmLength = 800.f;
-	CameraBoom->RelativeRotation = FRotator(-60.f, 0.f, 0.f);
-	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
 
-	// Create a camera...
-	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
-	TopDownCameraComponent->AttachTo(CameraBoom, USpringArmComponent::SocketName);
-	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+
+	view = PlayerView::TOP_DOWN;
+	initTopDownView();
 
 	// Create a decal in the world to show the cursor's location
 	//CursorToWorld = CreateDefaultSubobject<UDecalComponent>("CursorToWorld");
@@ -54,6 +46,10 @@ AUE4VoxelTerrainCharacter::AUE4VoxelTerrainCharacter()
 
 void AUE4VoxelTerrainCharacter::Tick(float DeltaSeconds)
 {
+	if (view != PlayerView::TOP_DOWN) {
+		return;
+	}
+
 	//if (CursorToWorld != nullptr)
 	{
 		if (APlayerController* PC = Cast<APlayerController>(GetController()))
@@ -78,50 +74,4 @@ void AUE4VoxelTerrainCharacter::Tick(float DeltaSeconds)
 
 		}
 	}
-}
-
-
-void AUE4VoxelTerrainCharacter::initTopDownView() {
-	/*
-	// Configure character movement
-	GetCharacterMovement()->bOrientRotationToMovement = true; // Rotate character to moving direction
-	GetCharacterMovement()->RotationRate = FRotator(0.f, 640.f, 0.f);
-	GetCharacterMovement()->bConstrainToPlane = true;
-	GetCharacterMovement()->bSnapToPlaneAtStart = true;
-
-	CameraBoom->bAbsoluteRotation = true; // Don't want arm to rotate when character does
-	
-	CameraBoom->SetRelativeRotation(FRotator(-60.f, 0.f, 0.f));
-	CameraBoom->TargetArmLength = 800.f;
-	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
-	CameraBoom->bUsePawnControlRotation = false; // Rotate the arm based on the controller
-	CameraBoom->ProbeSize = 0;
-	CameraBoom->RelativeLocation = FVector(0, 0, 0);
-
-	//FollowCamera->DetachFromParent();
-	FollowCamera->AttachTo(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
-	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
-	FollowCamera->RelativeLocation = FVector(0, 0, 0); // Position the camera
-	*/
-}
-
-void AUE4VoxelTerrainCharacter::initThirdPersonView() {
-	/*
-	// Configure character movement
-	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
-	GetCharacterMovement()->JumpZVelocity = 600.f;
-	GetCharacterMovement()->AirControl = 0.2f;
-
-	CameraBoom->TargetArmLength = 300.0f; // The camera follows at this distance behind the character	
-	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
-	CameraBoom->bDoCollisionTest = true;
-	CameraBoom->ProbeSize = 12;
-	CameraBoom->RelativeLocation = FVector(40, 30, 64);
-
-	FollowCamera->DetachFromParent();
-	FollowCamera->AttachTo(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
-	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
-	FollowCamera->RelativeLocation = FVector(0, 0, 0); // Position the camera
-	*/
 }
