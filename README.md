@@ -15,9 +15,9 @@ Work in progress.
 5. open project with Unreal Engine 4
 
 # Download
-**Link to download last stable version 0.0.1** 
+**Link to download last stable version 0.0.5** 
 
-http://bit.ly/2eP5GtU
+http://bit.ly/2fdWHRW
 
 # Controls
 V - toggle view (top down / third person)
