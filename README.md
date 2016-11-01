@@ -18,5 +18,18 @@ Work in progress.
 **Link to download last stable version 0.0.1** 
 http://bit.ly/2eP5GtU
 
+# Controls
+V - toggle view (top down / third person)
+
+**Top down view:**
+Left mouse button - move character to selected point
+Right mouse button - use tool 
+1,2 - change tool
+
+**Third person view:**
+WSAD - move character
+Mouse - camera look
+
+
 # License
 MIT license
