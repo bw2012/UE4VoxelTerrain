@@ -61,6 +61,10 @@ void AUE4VoxelTerrainCharacter::Tick(float DeltaSeconds)
 			//CursorToWorld->SetWorldLocation(TraceHitResult.Location);
 			//CursorToWorld->SetWorldRotation(CursorR);
 
+			if (!TraceHitResult.bBlockingHit) {
+				return;
+			}
+
 			AUE4VoxelTerrainPlayerController* controller = Cast<AUE4VoxelTerrainPlayerController>(GetController());
 
 			if (controller -> tool_mode == 1) {
