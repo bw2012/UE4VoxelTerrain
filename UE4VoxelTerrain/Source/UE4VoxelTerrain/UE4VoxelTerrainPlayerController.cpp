@@ -46,7 +46,7 @@ void AUE4VoxelTerrainPlayerController::MoveToMouseCursor()
 {
 	// Trace to see what is under the mouse cursor
 	FHitResult Hit;
-	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+	GetHitResultUnderCursor(ECC_WorldStatic, false, Hit);
 
 	if (Hit.bBlockingHit)
 	{
@@ -116,7 +116,7 @@ void AUE4VoxelTerrainPlayerController::test()
 	}
 
 	FHitResult Hit;
-	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+	GetHitResultUnderCursor(ECC_WorldStatic, false, Hit);
 
 	if (Hit.bBlockingHit)
 	{
