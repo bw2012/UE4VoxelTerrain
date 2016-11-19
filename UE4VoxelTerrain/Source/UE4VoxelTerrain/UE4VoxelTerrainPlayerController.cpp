@@ -36,7 +36,9 @@ void AUE4VoxelTerrainPlayerController::SetupInputComponent()
 	//InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AUE4VoxelTerrainPlayerController::MoveToTouchLocation);
 	//InputComponent->BindTouch(EInputEvent::IE_Repeat, this, &AUE4VoxelTerrainPlayerController::MoveToTouchLocation);
 
-	InputComponent->BindAction("Test", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::test);
+	InputComponent->BindAction("Test", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::OnMainActionPressed);
+	InputComponent->BindAction("Test", IE_Released, this, &AUE4VoxelTerrainPlayerController::OnMainActionReleased);
+
 	InputComponent->BindAction("1", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::setTool1);
 	InputComponent->BindAction("2", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::setTool2);
 	InputComponent->BindAction("ToggleView", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::ToggleView);
@@ -108,7 +110,13 @@ void AUE4VoxelTerrainPlayerController::OnSetDestinationReleased()
 	bMoveToMouseCursor = false;
 }
 
-void AUE4VoxelTerrainPlayerController::test()
+
+void AUE4VoxelTerrainPlayerController::OnMainActionReleased() {
+	GetWorld()->GetTimerManager().ClearTimer(timer);
+}
+
+
+void AUE4VoxelTerrainPlayerController::OnMainActionPressed()
 {
 	ASandboxCharacter* pawn = Cast<ASandboxCharacter>(GetCharacter());
 	if (pawn->view != PlayerView::TOP_DOWN) {
@@ -127,6 +135,7 @@ void AUE4VoxelTerrainPlayerController::test()
 		if (controller != NULL) {
 			if (tool_mode == 1) {
 				controller->digTerrainRoundHole(Hit.ImpactPoint, 80, 5);
+				GetWorld()->GetTimerManager().SetTimer(timer, this, &AUE4VoxelTerrainPlayerController::PerformAction, 0.2, true);
 			}
 
 			if (tool_mode == 2) {
@@ -164,3 +173,27 @@ void AUE4VoxelTerrainPlayerController::ToggleView() {
 		//z_cut_context.force_check = true;
 	} 
 }
+
+void AUE4VoxelTerrainPlayerController::PerformAction()
+{
+	ASandboxCharacter* pawn = Cast<ASandboxCharacter>(GetCharacter());
+	if (pawn->view != PlayerView::TOP_DOWN) {
+		return;
+	}
+
+	FHitResult Hit;
+	GetHitResultUnderCursor(ECC_WorldStatic, false, Hit);
+
+	if (Hit.bBlockingHit) {
+		ASandboxTerrainController* controller = ASandboxTerrainController::GetZoneInstance(Hit.Actor.Get());
+		if (controller != NULL) {
+			if (tool_mode == 1) {
+				controller->digTerrainRoundHole(Hit.ImpactPoint, 80, 5);
+			}
+		}
+	}
+}
+
+
+
+
