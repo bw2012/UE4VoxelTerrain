@@ -40,13 +40,21 @@ public:
 	int tool_mode = 0;
 
 private:
-	void test();
+	void OnMainActionPressed();
+
+	void OnMainActionReleased();
+
+	FHitResult CerrentPos;
 	
 	void setTool1();
 
 	void setTool2();
 
 	void ToggleView();
+
+	FTimerHandle timer;
+
+	void PerformAction();
 
 };
 
