@@ -126,20 +126,17 @@ void AUE4VoxelTerrainPlayerController::OnMainActionPressed()
 	FHitResult Hit;
 	GetHitResultUnderCursor(ECC_WorldStatic, false, Hit);
 
-	if (Hit.bBlockingHit)
-	{
+	if (Hit.bBlockingHit) {
 		UE_LOG(LogTemp, Warning, TEXT("test point -> %f %f %f"), Hit.ImpactPoint.X, Hit.ImpactPoint.Y, Hit.ImpactPoint.Z);
-		
-		// TODO: check controller
-		ASandboxTerrainController* controller = ASandboxTerrainController::GetZoneInstance(Hit.Actor.Get());
-		if (controller != NULL) {
+		ASandboxTerrainController* terrain = Cast<ASandboxTerrainController>(Hit.Actor.Get());
+		if (terrain != NULL) {
 			if (tool_mode == 1) {
-				controller->digTerrainRoundHole(Hit.ImpactPoint, 80, 5);
+				terrain->digTerrainRoundHole(Hit.ImpactPoint, 80, 5);
 				GetWorld()->GetTimerManager().SetTimer(timer, this, &AUE4VoxelTerrainPlayerController::PerformAction, 0.2, true);
 			}
 
 			if (tool_mode == 2) {
-				controller->digTerrainCubeHole(Hit.ImpactPoint, 110, 5);
+				terrain->digTerrainCubeHole(Hit.ImpactPoint, 110, 5);
 			}
 		}
 	}
@@ -185,10 +182,10 @@ void AUE4VoxelTerrainPlayerController::PerformAction()
 	GetHitResultUnderCursor(ECC_WorldStatic, false, Hit);
 
 	if (Hit.bBlockingHit) {
-		ASandboxTerrainController* controller = ASandboxTerrainController::GetZoneInstance(Hit.Actor.Get());
-		if (controller != NULL) {
+		ASandboxTerrainController* terrain = Cast<ASandboxTerrainController>(Hit.Actor.Get());
+		if (terrain != NULL) {
 			if (tool_mode == 1) {
-				controller->digTerrainRoundHole(Hit.ImpactPoint, 80, 5);
+				terrain->digTerrainRoundHole(Hit.ImpactPoint, 80, 5);
 			}
 		}
 	}
