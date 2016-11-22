@@ -1,5 +1,5 @@
 # UE4VoxelTerrain
-Unreal Engine 4 voxel terrian example (based on Marching Cubes algorithm)
+Unreal Engine 4 voxel terrian example (based on Transvoxel™ Algorithm by Eric Lengyel http://transvoxel.org/)
 
 **Tested with Unreal Engine 4.13.2**
 
