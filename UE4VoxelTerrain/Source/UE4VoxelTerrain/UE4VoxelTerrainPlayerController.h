@@ -21,7 +21,6 @@ protected:
 
 	virtual void OnMainActionPressed() override;
 
-
 	void PerformAction();
 
 public:
