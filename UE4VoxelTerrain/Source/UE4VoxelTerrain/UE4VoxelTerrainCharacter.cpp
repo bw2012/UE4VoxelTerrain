@@ -14,6 +14,7 @@ AUE4VoxelTerrainCharacter::AUE4VoxelTerrainCharacter() {
 }
 
 void AUE4VoxelTerrainCharacter::Tick(float DeltaSeconds) {
+	Super::Tick(DeltaSeconds);
 
 	if (GetSandboxPlayerView() != PlayerView::TOP_DOWN) {
 		return;
