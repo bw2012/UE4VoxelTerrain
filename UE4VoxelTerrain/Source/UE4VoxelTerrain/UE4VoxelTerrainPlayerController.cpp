@@ -23,6 +23,14 @@ void AUE4VoxelTerrainPlayerController::SetupInputComponent() {
 }
 
 void AUE4VoxelTerrainPlayerController::OnMainActionPressed() {
+	SetDestinationPressed();
+}
+
+void AUE4VoxelTerrainPlayerController::OnMainActionReleased() {
+	SetDestinationReleased();
+}
+
+void AUE4VoxelTerrainPlayerController::OnAltActionPressed() {
 	ASandboxCharacter* pawn = Cast<ASandboxCharacter>(GetCharacter());
 	if (pawn->GetSandboxPlayerView() != PlayerView::TOP_DOWN) {
 		return;
@@ -45,6 +53,10 @@ void AUE4VoxelTerrainPlayerController::OnMainActionPressed() {
 			}
 		}
 	}
+}
+
+void AUE4VoxelTerrainPlayerController::OnAltActionReleased() {
+	GetWorld()->GetTimerManager().ClearTimer(timer);
 }
 
 void AUE4VoxelTerrainPlayerController::setTool1() {

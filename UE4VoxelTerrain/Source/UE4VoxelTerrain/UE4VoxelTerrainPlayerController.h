@@ -19,7 +19,13 @@ protected:
 
 	virtual void SetupInputComponent() override;
 
-	virtual void OnMainActionPressed() override;
+	virtual void OnMainActionPressed();
+
+	virtual void OnMainActionReleased();
+
+	virtual void OnAltActionPressed();
+
+	virtual void OnAltActionReleased();
 
 	void PerformAction();
 
@@ -27,6 +33,8 @@ public:
 	int tool_mode = 0;
 
 private:
+
+	FTimerHandle timer;
 	
 	void setTool1();
 
