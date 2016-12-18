@@ -6,6 +6,7 @@
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 #include "DrawDebugHelpers.h"
+#include "SandboxTerrainController.h"
 
 AUE4VoxelTerrainCharacter::AUE4VoxelTerrainCharacter() {
 
@@ -33,17 +34,19 @@ void AUE4VoxelTerrainCharacter::Tick(float DeltaSeconds) {
 				return;
 			}
 
-			AUE4VoxelTerrainPlayerController* controller = Cast<AUE4VoxelTerrainPlayerController>(GetController());
+			ASandboxTerrainController* TerrainController = Cast<ASandboxTerrainController>(TraceHitResult.Actor.Get());
 
-			if (controller -> tool_mode == 1) {
-				DrawDebugSphere(GetWorld(), TraceHitResult.Location, 80, 24, FColor(255, 255, 255, 100));
+			if (TerrainController != nullptr) {
+				AUE4VoxelTerrainPlayerController* controller = Cast<AUE4VoxelTerrainPlayerController>(GetController());
+
+				if (controller->tool_mode == 1) {
+					DrawDebugSphere(GetWorld(), TraceHitResult.Location, 80, 24, FColor(255, 255, 255, 100));
+				}
+
+				if (controller->tool_mode == 2) {
+					DrawDebugBox(GetWorld(), TraceHitResult.Location, FVector(105), FColor(255, 255, 255, 100));
+				}
 			}
-
-			if (controller->tool_mode == 2) {
-				DrawDebugBox(GetWorld(), TraceHitResult.Location, FVector(105), FColor(255, 255, 255, 100));
-			}
-
-
 		}
 	}
 }
