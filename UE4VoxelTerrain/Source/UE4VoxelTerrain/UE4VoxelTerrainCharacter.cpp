@@ -8,6 +8,8 @@
 #include "DrawDebugHelpers.h"
 #include "SandboxTerrainController.h"
 
+#include <cmath>
+
 AUE4VoxelTerrainCharacter::AUE4VoxelTerrainCharacter() {
 
 
@@ -46,6 +48,17 @@ void AUE4VoxelTerrainCharacter::Tick(float DeltaSeconds) {
 
 				if (controller->tool_mode == 2) {
 					DrawDebugBox(GetWorld(), TraceHitResult.Location, FVector(105), FColor(255, 255, 255, 100));
+				}
+
+				if (controller->tool_mode == 3) {
+					static const float GridRange = 200;
+					FVector Tmp(TraceHitResult.Location);
+					Tmp /= GridRange;
+					Tmp.Set(std::round(Tmp.X), std::round(Tmp.Y), std::round(Tmp.Z));
+					Tmp *= GridRange;
+					FVector Position((int)Tmp.X, (int)Tmp.Y, (int)Tmp.Z);
+
+					DrawDebugBox(GetWorld(), Position, FVector(105), FColor(255, 255, 255, 100));
 				}
 			}
 		}

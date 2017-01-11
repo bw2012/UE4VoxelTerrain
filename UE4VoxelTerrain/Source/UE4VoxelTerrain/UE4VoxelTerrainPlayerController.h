@@ -40,6 +40,8 @@ private:
 
 	void setTool2();
 
+	void setTool3();
+
 };
 
 
