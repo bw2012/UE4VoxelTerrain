@@ -30,11 +30,16 @@ protected:
 	void PerformAction();
 
 public:
+
 	int tool_mode = 0;
+
+	FHitResult TracePlayerActionPoint();
 
 private:
 
 	FTimerHandle timer;
+
+	void setTool0();
 	
 	void setTool1();
 

@@ -7,6 +7,7 @@
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 #include "DrawDebugHelpers.h"
 #include "SandboxTerrainController.h"
+#include "UE4VoxelTerrainPlayerController.h"
 
 #include <cmath>
 
@@ -18,20 +19,10 @@ AUE4VoxelTerrainCharacter::AUE4VoxelTerrainCharacter() {
 void AUE4VoxelTerrainCharacter::Tick(float DeltaSeconds) {
 	Super::Tick(DeltaSeconds);
 
-	if (GetSandboxPlayerView() != PlayerView::TOP_DOWN) {
-		return;
-	}
-
 	//if (CursorToWorld != nullptr)
 	{
-		if (APlayerController* PC = Cast<APlayerController>(GetController()))
-		{
-			FHitResult TraceHitResult;
-			PC->GetHitResultUnderCursor(ECC_WorldStatic, true, TraceHitResult);
-			FVector CursorFV = TraceHitResult.ImpactNormal;
-			FRotator CursorR = CursorFV.Rotation();
-			//CursorToWorld->SetWorldLocation(TraceHitResult.Location);
-			//CursorToWorld->SetWorldRotation(CursorR);
+		if (AUE4VoxelTerrainPlayerController* PC = Cast<AUE4VoxelTerrainPlayerController>(GetController())) {
+			FHitResult TraceHitResult = PC->TracePlayerActionPoint();
 
 			if (!TraceHitResult.bBlockingHit) {
 				return;
@@ -64,3 +55,4 @@ void AUE4VoxelTerrainCharacter::Tick(float DeltaSeconds) {
 		}
 	}
 }
+

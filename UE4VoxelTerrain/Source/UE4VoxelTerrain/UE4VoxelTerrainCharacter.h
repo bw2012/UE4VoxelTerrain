@@ -13,7 +13,6 @@ public:
 	AUE4VoxelTerrainCharacter();
 
 	virtual void Tick(float DeltaSeconds) override;
-	
 
 private:
 

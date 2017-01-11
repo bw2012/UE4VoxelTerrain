@@ -18,6 +18,7 @@ void AUE4VoxelTerrainPlayerController::SetupInputComponent() {
 	// set up gameplay key bindings
 	Super::SetupInputComponent();
 
+	InputComponent->BindAction("0", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::setTool0);
 	InputComponent->BindAction("1", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::setTool1);
 	InputComponent->BindAction("2", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::setTool2);
 	InputComponent->BindAction("3", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::setTool3);
@@ -33,12 +34,8 @@ void AUE4VoxelTerrainPlayerController::OnMainActionReleased() {
 
 void AUE4VoxelTerrainPlayerController::OnAltActionPressed() {
 	ASandboxCharacter* pawn = Cast<ASandboxCharacter>(GetCharacter());
-	if (pawn->GetSandboxPlayerView() != PlayerView::TOP_DOWN) {
-		return;
-	}
 
-	FHitResult Hit;
-	GetHitResultUnderCursor(ECC_WorldStatic, false, Hit);
+	FHitResult Hit = TracePlayerActionPoint();
 
 	if (Hit.bBlockingHit) {
 		UE_LOG(LogTemp, Warning, TEXT("test point -> %f %f %f"), Hit.ImpactPoint.X, Hit.ImpactPoint.Y, Hit.ImpactPoint.Z);
@@ -69,6 +66,10 @@ void AUE4VoxelTerrainPlayerController::OnAltActionPressed() {
 
 void AUE4VoxelTerrainPlayerController::OnAltActionReleased() {
 	GetWorld()->GetTimerManager().ClearTimer(timer);
+}
+
+void AUE4VoxelTerrainPlayerController::setTool0() {
+	tool_mode = 0;
 }
 
 void AUE4VoxelTerrainPlayerController::setTool1() {
@@ -103,3 +104,40 @@ void AUE4VoxelTerrainPlayerController::PerformAction() {
 }
 
 
+FHitResult AUE4VoxelTerrainPlayerController::TracePlayerActionPoint() {
+	ASandboxCharacter* pawn = Cast<ASandboxCharacter>(GetCharacter());
+
+	if (pawn->GetSandboxPlayerView() == PlayerView::THIRD_PERSON) {
+		float MaxUseDistance = 800;
+		if (pawn->GetCameraBoom() != NULL) {
+			MaxUseDistance = pawn->GetCameraBoom()->TargetArmLength + 800;
+		}
+
+		FVector CamLoc;
+		FRotator CamRot;
+		GetPlayerViewPoint(CamLoc, CamRot);
+
+		const FVector StartTrace = CamLoc;
+		const FVector Direction = CamRot.Vector();
+		const FVector EndTrace = StartTrace + (Direction * MaxUseDistance);
+
+		FCollisionQueryParams TraceParams(FName(TEXT("")), true, this);
+		TraceParams.bTraceAsyncScene = true;
+		TraceParams.bReturnPhysicalMaterial = false;
+		TraceParams.bTraceComplex = true;
+		TraceParams.AddIgnoredActor(pawn);
+
+		FHitResult Hit(ForceInit);
+		GetWorld()->LineTraceSingleByChannel(Hit, StartTrace, EndTrace, ECC_Visibility, TraceParams);
+
+		return Hit;
+	}
+
+	if (pawn->GetSandboxPlayerView() == PlayerView::TOP_DOWN) {
+		FHitResult Hit;
+		GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+		return Hit;
+	}
+
+	return FHitResult();
+}
