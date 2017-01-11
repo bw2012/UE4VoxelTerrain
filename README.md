@@ -5,6 +5,8 @@ Unreal Engine 4 procedural voxel terrian example (based on Transvoxel™ Algorit
 
 ![Unreal Engine 4 voxel terrian](http://media.indiedb.com/images/games/1/51/50197/ezgif.com-video-to-gif_2.gif)
 
+![Unreal Engine 4 voxel terrian](http://www.unrealsandbox.com/grass.gif)
+
 Demo video - https://www.youtube.com/watch?v=Z__-wuxeUsI
 
 **Work in progress. Some features is not finished/buggy/has ugly code/do not meet your expectations.**
@@ -13,6 +15,7 @@ Demo video - https://www.youtube.com/watch?v=Z__-wuxeUsI
 * Runtime terrain modification
 * Procedural landscape/caves generation
 * Level of details (per chunk)
+* Foliage
 
 # Usage
 1. git clone --recursive https://github.com/bw2012/UE4VoxelTerrain.git 
