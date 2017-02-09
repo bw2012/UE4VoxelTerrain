@@ -38,7 +38,8 @@ void AUE4VoxelTerrainCharacter::Tick(float DeltaSeconds) {
 				}
 
 				if (controller->tool_mode == 2) {
-					DrawDebugBox(GetWorld(), TraceHitResult.Location, FVector(105), FColor(255, 255, 255, 100));
+					//DrawDebugBox(GetWorld(), TraceHitResult.Location, FVector(105), FColor(255, 255, 255, 100));
+					DrawDebugSphere(GetWorld(), TraceHitResult.Location, 60, 24, FColor(100, 255, 255, 100));
 				}
 
 				if (controller->tool_mode == 3) {

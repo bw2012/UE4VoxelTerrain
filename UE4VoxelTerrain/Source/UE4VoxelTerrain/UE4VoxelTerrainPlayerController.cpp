@@ -47,7 +47,8 @@ void AUE4VoxelTerrainPlayerController::OnAltActionPressed() {
 			}
 
 			if (tool_mode == 2) {
-				terrain->digTerrainCubeHole(Hit.ImpactPoint, 110, 5);
+				//terrain->digTerrainCubeHole(Hit.ImpactPoint, 110, 5);
+				terrain->fillTerrainRound(Hit.ImpactPoint, 60, 5, 1); //dirt
 			}
 
 			if (tool_mode == 3) {
