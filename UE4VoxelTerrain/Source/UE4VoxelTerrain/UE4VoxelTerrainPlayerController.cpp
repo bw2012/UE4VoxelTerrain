@@ -22,6 +22,7 @@ void AUE4VoxelTerrainPlayerController::SetupInputComponent() {
 	InputComponent->BindAction("1", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::setTool1);
 	InputComponent->BindAction("2", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::setTool2);
 	InputComponent->BindAction("3", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::setTool3);
+	InputComponent->BindAction("4", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::setTool4);
 }
 
 void AUE4VoxelTerrainPlayerController::OnMainActionPressed() {
@@ -47,8 +48,7 @@ void AUE4VoxelTerrainPlayerController::OnAltActionPressed() {
 			}
 
 			if (tool_mode == 2) {
-				//terrain->digTerrainCubeHole(Hit.ImpactPoint, 110, 5);
-				terrain->fillTerrainRound(Hit.ImpactPoint, 60, 5, 1); //dirt
+				terrain->digTerrainCubeHole(Hit.ImpactPoint, 110, 5);
 			}
 
 			if (tool_mode == 3) {
@@ -60,6 +60,10 @@ void AUE4VoxelTerrainPlayerController::OnAltActionPressed() {
 				FVector Position((int)Tmp.X, (int)Tmp.Y, (int)Tmp.Z);
 
 				terrain->digTerrainCubeHole(Position, 110, 5);
+			}
+
+			if (tool_mode == 4) {
+				terrain->fillTerrainRound(Hit.ImpactPoint, 60, 5, 1); //dirt
 			}
 		}
 	}
@@ -83,6 +87,10 @@ void AUE4VoxelTerrainPlayerController::setTool2() {
 
 void AUE4VoxelTerrainPlayerController::setTool3() {
 	tool_mode = 3;
+}
+
+void AUE4VoxelTerrainPlayerController::setTool4() {
+	tool_mode = 4;
 }
 
 void AUE4VoxelTerrainPlayerController::PerformAction() {

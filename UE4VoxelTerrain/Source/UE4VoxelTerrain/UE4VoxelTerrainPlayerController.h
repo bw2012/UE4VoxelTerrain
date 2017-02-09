@@ -47,6 +47,8 @@ private:
 
 	void setTool3();
 
+	void setTool4();
+
 };
 
 
