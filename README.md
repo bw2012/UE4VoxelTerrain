@@ -23,9 +23,9 @@ Demo video - https://www.youtube.com/watch?v=Z__-wuxeUsI
 5. open project with Unreal Engine 4
 
 # Download
-**Link to download last stable version 0.0.7 (Unreal Engine 4.15.0)** 
+**Link to download last stable version 0.0.8 (Unreal Engine 4.15.0)** 
 
-http://bit.ly/2kFk0ve
+http://bit.ly/2mg19mE
 
 # Controls
 ```V ``` - toggle view (top down / third person)
