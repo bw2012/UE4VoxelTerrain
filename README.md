@@ -25,7 +25,7 @@ Demo video - https://www.youtube.com/watch?v=Z__-wuxeUsI
 # Download
 **Link to download last stable version 0.0.7 (Unreal Engine 4.15.0)** 
 
-http://bit.ly/2fdWHRW
+http://bit.ly/2kFk0ve
 
 # Controls
 ```V ``` - toggle view (top down / third person)
