@@ -1,7 +1,7 @@
 # UE4VoxelTerrain
 Unreal Engine 4 procedural voxel terrian example (based on Transvoxel™ Algorithm by Eric Lengyel http://transvoxel.org/)
 
-**Master branch tested with Unreal Engine 4.14.3 [Windows 7 x64]**
+**Master branch tested with Unreal Engine 4.15.0 [Windows 7 x64]**
 
 ![Unreal Engine 4 voxel terrian](http://media.indiedb.com/images/games/1/51/50197/ezgif.com-video-to-gif_2.gif)
 
@@ -23,7 +23,7 @@ Demo video - https://www.youtube.com/watch?v=Z__-wuxeUsI
 5. open project with Unreal Engine 4
 
 # Download
-**Link to download last stable version 0.0.5 (Unreal Engine 4.13.2)** 
+**Link to download last stable version 0.0.7 (Unreal Engine 4.15.0)** 
 
 http://bit.ly/2fdWHRW
 
