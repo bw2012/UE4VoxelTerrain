@@ -17,6 +17,7 @@ Demo video - https://www.youtube.com/watch?v=Z__-wuxeUsI
 * Procedural landscape/caves generation
 * Level of details (per chunk)
 * Foliage
+* Up to 65535 terrain materials
 
 # Roadmap
 https://trello.com/b/R7E4YgtC/ue4-sandboxterrain-plugin
@@ -40,7 +41,7 @@ http://bit.ly/2mg19mE
 
 ```Right mouse button ``` - use tool 
 
-```1 ``` ```2 ``` - change tool
+```1 ``` ... ```4 ``` - change tool
 
 **Third person view:**
 

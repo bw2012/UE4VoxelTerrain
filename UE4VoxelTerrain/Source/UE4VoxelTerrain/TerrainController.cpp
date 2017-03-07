@@ -4,7 +4,7 @@
 #include "TerrainController.h"
 
 
-SandboxVoxelGenerator ATerrainController::newTerrainGenerator(VoxelData &voxel_data) {
+SandboxVoxelGenerator ATerrainController::newTerrainGenerator(TVoxelData &voxel_data) {
 	//UE_LOG(LogTemp, Warning, TEXT("terrain generator override"));
 	return ASandboxTerrainController::newTerrainGenerator(voxel_data);
 }
