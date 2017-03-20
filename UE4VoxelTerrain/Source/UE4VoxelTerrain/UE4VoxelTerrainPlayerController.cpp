@@ -44,7 +44,7 @@ void AUE4VoxelTerrainPlayerController::OnAltActionPressed() {
 		if (terrain != NULL) {
 			if (tool_mode == 1) {
 				terrain->digTerrainRoundHole(Hit.ImpactPoint, 80, 5);
-				GetWorld()->GetTimerManager().SetTimer(timer, this, &AUE4VoxelTerrainPlayerController::PerformAction, 0.2, true);
+				GetWorld()->GetTimerManager().SetTimer(timer, this, &AUE4VoxelTerrainPlayerController::PerformAction, 0.1, true);
 			}
 
 			if (tool_mode == 2) {
