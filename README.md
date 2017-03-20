@@ -28,9 +28,9 @@ https://trello.com/b/R7E4YgtC/ue4-sandboxterrain-plugin
 5. open project with Unreal Engine 4
 
 # Download
-**Link to download last stable version 0.0.8 (Unreal Engine 4.15.0)** 
+**Link to download last stable version 0.0.9-pre-alpha (Unreal Engine 4.15.0)** 
 
-http://bit.ly/2mg19mE
+http://bit.ly/2nLIII3
 
 # Controls
 ```V ``` - toggle view (top down / third person)
