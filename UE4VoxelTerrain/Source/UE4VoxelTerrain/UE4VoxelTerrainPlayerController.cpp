@@ -23,6 +23,8 @@ void AUE4VoxelTerrainPlayerController::SetupInputComponent() {
 	InputComponent->BindAction("2", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::setTool2);
 	InputComponent->BindAction("3", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::setTool3);
 	InputComponent->BindAction("4", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::setTool4);
+	InputComponent->BindAction("5", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::setTool5);
+	InputComponent->BindAction("6", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::setTool6);
 }
 
 void AUE4VoxelTerrainPlayerController::OnMainActionPressed() {
@@ -42,6 +44,12 @@ void AUE4VoxelTerrainPlayerController::OnAltActionPressed() {
 		UE_LOG(LogTemp, Warning, TEXT("test point -> %f %f %f"), Hit.ImpactPoint.X, Hit.ImpactPoint.Y, Hit.ImpactPoint.Z);
 		ASandboxTerrainController* terrain = Cast<ASandboxTerrainController>(Hit.Actor.Get());
 		if (terrain != NULL) {
+			FVector RegionIndex = terrain->GetRegionIndex(Hit.ImpactPoint);
+			FVector ZoneIndex = terrain->GetZoneIndex(Hit.ImpactPoint);
+
+			UE_LOG(LogTemp, Warning, TEXT("rIndex -> %f %f %f"), RegionIndex.X, RegionIndex.Y, RegionIndex.Z);
+			UE_LOG(LogTemp, Warning, TEXT("zIndex -> %f %f %f"), ZoneIndex.X, ZoneIndex.Y, ZoneIndex.Z);
+
 			if (tool_mode == 1) {
 				terrain->digTerrainRoundHole(Hit.ImpactPoint, 80, 5);
 				GetWorld()->GetTimerManager().SetTimer(timer, this, &AUE4VoxelTerrainPlayerController::PerformAction, 0.1, true);
@@ -64,6 +72,14 @@ void AUE4VoxelTerrainPlayerController::OnAltActionPressed() {
 
 			if (tool_mode == 4) {
 				terrain->fillTerrainRound(Hit.ImpactPoint, 60, 5, 3); //sand
+			}
+
+			if (tool_mode == 5) {
+				terrain->fillTerrainRound(Hit.ImpactPoint, 60, 5, 4); //basalt
+			}
+
+			if (tool_mode == 6) {
+				terrain->fillTerrainRound(Hit.ImpactPoint, 60, 5, 5); //gravel
 			}
 		}
 	}
@@ -91,6 +107,14 @@ void AUE4VoxelTerrainPlayerController::setTool3() {
 
 void AUE4VoxelTerrainPlayerController::setTool4() {
 	tool_mode = 4;
+}
+
+void AUE4VoxelTerrainPlayerController::setTool5() {
+	tool_mode = 5;
+}
+
+void AUE4VoxelTerrainPlayerController::setTool6() {
+	tool_mode = 6;
 }
 
 void AUE4VoxelTerrainPlayerController::PerformAction() {

@@ -55,6 +55,14 @@ void AUE4VoxelTerrainCharacter::Tick(float DeltaSeconds) {
 				if (controller->tool_mode == 4) {
 					DrawDebugSphere(GetWorld(), TraceHitResult.Location, 60, 24, FColor(100, 255, 255, 100));
 				}
+
+				if (controller->tool_mode == 5) {
+					DrawDebugSphere(GetWorld(), TraceHitResult.Location, 60, 24, FColor(255, 255, 100, 100));
+				}
+
+				if (controller->tool_mode == 6) {
+					DrawDebugSphere(GetWorld(), TraceHitResult.Location, 60, 24, FColor(255, 100, 255, 100));
+				}
 			}
 		}
 	}
