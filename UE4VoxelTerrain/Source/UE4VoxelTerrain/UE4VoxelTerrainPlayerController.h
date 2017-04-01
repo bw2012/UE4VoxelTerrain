@@ -53,6 +53,8 @@ private:
 
 	void setTool6();
 
+	void setTool7();
+
 };
 
 
