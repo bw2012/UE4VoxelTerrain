@@ -54,12 +54,12 @@ void AUE4VoxelTerrainPlayerController::OnAltActionPressed() {
 			UE_LOG(LogTemp, Warning, TEXT("zIndex -> %f %f %f"), ZoneIndex.X, ZoneIndex.Y, ZoneIndex.Z);
 
 			if (tool_mode == 1) {
-				terrain->digTerrainRoundHole(Hit.ImpactPoint, 80, 5);
+				terrain->DigTerrainRoundHole(Hit.ImpactPoint, 80, 5);
 				GetWorld()->GetTimerManager().SetTimer(timer, this, &AUE4VoxelTerrainPlayerController::PerformAction, 0.1, true);
 			}
 
 			if (tool_mode == 2) {
-				terrain->digTerrainCubeHole(Hit.ImpactPoint, 110, 5);
+				terrain->DigTerrainCubeHole(Hit.ImpactPoint, 110, 5);
 			}
 
 			if (tool_mode == 3) {
@@ -69,19 +69,19 @@ void AUE4VoxelTerrainPlayerController::OnAltActionPressed() {
 				Tmp *= GridRange;
 				FVector Position((int)Tmp.X, (int)Tmp.Y, (int)Tmp.Z);
 
-				terrain->digTerrainCubeHole(Position, 110, 5);
+				terrain->DigTerrainCubeHole(Position, 110, 5);
 			}
 
 			if (tool_mode == 4) {
-				terrain->fillTerrainRound(Hit.ImpactPoint, 60, 5, 3); //sand
+				terrain->FillTerrainRound(Hit.ImpactPoint, 60, 5, 3); //sand
 			}
 
 			if (tool_mode == 5) {
-				terrain->fillTerrainRound(Hit.ImpactPoint, 60, 5, 4); //basalt
+				terrain->FillTerrainRound(Hit.ImpactPoint, 60, 5, 4); //basalt
 			}
 
 			if (tool_mode == 6) {
-				terrain->fillTerrainRound(Hit.ImpactPoint, 60, 5, 5); //gravel
+				terrain->FillTerrainRound(Hit.ImpactPoint, 60, 5, 5); //gravel
 			}
 
 			if (tool_mode == 7) {
@@ -91,7 +91,7 @@ void AUE4VoxelTerrainPlayerController::OnAltActionPressed() {
 				Tmp *= GridRange;
 				FVector Position((int)Tmp.X, (int)Tmp.Y, ((int)Tmp.Z) + GridRange);
 
-				terrain->fillTerrainCubeHole(Position, 110, 5, 4); // basalt
+				terrain->FillTerrainCube(Position, 110, 5, 4); // basalt
 			}
 		}
 	}
@@ -146,7 +146,7 @@ void AUE4VoxelTerrainPlayerController::PerformAction() {
 		ASandboxTerrainController* terrain = Cast<ASandboxTerrainController>(Hit.Actor.Get());
 		if (terrain != NULL) {
 			if (tool_mode == 1) {
-				terrain->digTerrainRoundHole(Hit.ImpactPoint, 80, 5);
+				terrain->DigTerrainRoundHole(Hit.ImpactPoint, 80, 5);
 			}
 		}
 	}
