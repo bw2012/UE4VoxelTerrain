@@ -8,10 +8,6 @@ This plugin provides tools to generate, visualize and in-game change volume terr
 
 ![Grass](http://www.unrealsandbox.com/grass4.gif)
 
-Demo video - https://www.youtube.com/watch?v=Z__-wuxeUsI
-
-**Work in progress. Some features is not finished/buggy/has ugly code/do not meet your expectations.**
-
 # Features
 * Runtime terrain modification
 * Procedural landscape/caves generation
@@ -19,10 +15,16 @@ Demo video - https://www.youtube.com/watch?v=Z__-wuxeUsI
 * Foliage
 * Up to 65535 terrain materials
 
+# Attention
+* This project uses git submodules. Make sure that project are cloned properly and folder UE4VoxelTerrain/Plugins is not empty.
+* If you have not idea that means 'git submodules' and 'clone recursive' just download last stable version (see link below). 
+* Work in progress. Some features is not finished/buggy/has ugly code/do not meet your expectations.
+
 # Usage
-1. git clone --recursive https://github.com/bw2012/UE4VoxelTerrain.git 
-2. cd UE4VoxelTerrain
-5. open project with Unreal Engine 4
+1. Install MS Visual Studio 2015
+2. Download last stable project or clone repository properly ```git clone --recursive https://github.com/bw2012/UE4VoxelTerrain.git``` 
+2. Open directory UE4VoxelTerrain
+5. Open project file with Unreal Engine 4.15
 
 # Download
 **Link to download last stable version 0.0.9-pre-alpha (Unreal Engine 4.15.0)** 
@@ -38,7 +40,7 @@ http://bit.ly/2nLIII3
 
 ```Right mouse button ``` - use tool 
 
-```1 ``` ... ```4 ``` - change tool
+```1 ``` ... ```7 ``` - change tool
 
 **Third person view:**
 
