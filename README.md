@@ -22,9 +22,9 @@ This plugin provides tools to generate, visualize and in-game change volume terr
 
 # Usage
 1. Install MS Visual Studio 2015
-2a. Download last stable project 
-2b. Or clone repository properly ```git clone --recursive https://github.com/bw2012/UE4VoxelTerrain.git```
-2. Open directory UE4VoxelTerrain
+2. Download last stable project 
+3. Or clone repository properly ```git clone --recursive https://github.com/bw2012/UE4VoxelTerrain.git```
+4. Open directory UE4VoxelTerrain
 5. Open project file with Unreal Engine 4.15
 
 # Download
