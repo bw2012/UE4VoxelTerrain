@@ -41,8 +41,6 @@ void AUE4VoxelTerrainPlayerController::OnAltActionPressed() {
 
 	FHitResult Hit = TracePlayerActionPoint();
 
-	static const float GridRange = 200;
-
 	if (Hit.bBlockingHit) {
 		UE_LOG(LogTemp, Warning, TEXT("test point -> %f %f %f"), Hit.ImpactPoint.X, Hit.ImpactPoint.Y, Hit.ImpactPoint.Z);
 		ASandboxTerrainController* terrain = Cast<ASandboxTerrainController>(Hit.Actor.Get());
@@ -63,6 +61,7 @@ void AUE4VoxelTerrainPlayerController::OnAltActionPressed() {
 			}
 
 			if (tool_mode == 3) {
+				static const float GridRange = 100;
 				FVector Tmp(Hit.ImpactPoint);
 				Tmp /= GridRange;
 				Tmp.Set(std::round(Tmp.X), std::round(Tmp.Y), std::round(Tmp.Z));
@@ -73,25 +72,26 @@ void AUE4VoxelTerrainPlayerController::OnAltActionPressed() {
 			}
 
 			if (tool_mode == 4) {
-				terrain->FillTerrainRound(Hit.ImpactPoint, 60, 5, 3); //sand
+				terrain->FillTerrainRound(Hit.ImpactPoint, 60, 3); //sand
 			}
 
 			if (tool_mode == 5) {
-				terrain->FillTerrainRound(Hit.ImpactPoint, 60, 5, 4); //basalt
+				terrain->FillTerrainRound(Hit.ImpactPoint, 60, 4); //basalt
 			}
 
 			if (tool_mode == 6) {
-				terrain->FillTerrainRound(Hit.ImpactPoint, 60, 5, 5); //gravel
+				terrain->FillTerrainRound(Hit.ImpactPoint, 60, 5); //gravel
 			}
 
 			if (tool_mode == 7) {
+				static const float GridRange = 100;
 				FVector Tmp(Hit.ImpactPoint);
 				Tmp /= GridRange;
 				Tmp.Set(std::round(Tmp.X), std::round(Tmp.Y), std::floor(Tmp.Z));
 				Tmp *= GridRange;
 				FVector Position((int)Tmp.X, (int)Tmp.Y, ((int)Tmp.Z) + GridRange);
 
-				terrain->FillTerrainCube(Position, 110, 5, 4); // basalt
+				terrain->FillTerrainCube(Position, 55, 4); // basalt
 			}
 		}
 	}

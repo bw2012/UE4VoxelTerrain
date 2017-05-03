@@ -28,8 +28,6 @@ void AUE4VoxelTerrainCharacter::Tick(float DeltaSeconds) {
 				return;
 			}
 
-			static const float GridRange = 200;
-
 			ASandboxTerrainController* TerrainController = Cast<ASandboxTerrainController>(TraceHitResult.Actor.Get());
 
 			if (TerrainController != nullptr) {
@@ -44,13 +42,14 @@ void AUE4VoxelTerrainCharacter::Tick(float DeltaSeconds) {
 				}
 
 				if (controller->tool_mode == 3) {
+					static const float GridRange = 100;
 					FVector Tmp(TraceHitResult.Location);
 					Tmp /= GridRange;
 					Tmp.Set(std::round(Tmp.X), std::round(Tmp.Y), std::round(Tmp.Z));
 					Tmp *= GridRange;
 					FVector Position((int)Tmp.X, (int)Tmp.Y, (int)Tmp.Z);
 
-					DrawDebugBox(GetWorld(), Position, FVector(105), FColor(255, 255, 255, 100));
+					DrawDebugBox(GetWorld(), Position, FVector(100), FColor(255, 255, 255, 100));
 				}
 
 				if (controller->tool_mode == 4) {
@@ -66,15 +65,14 @@ void AUE4VoxelTerrainCharacter::Tick(float DeltaSeconds) {
 				}
 
 				if (controller->tool_mode == 7) {
-
-					static const float GridRange = 200;
+					static const float GridRange = 100;
 					FVector Tmp(TraceHitResult.Location);
 					Tmp /= GridRange;
 					Tmp.Set(std::round(Tmp.X), std::round(Tmp.Y), std::floor(Tmp.Z));
 					Tmp *= GridRange;
 					FVector Position((int)Tmp.X, (int)Tmp.Y, ((int)Tmp.Z) + GridRange);
 
-					DrawDebugBox(GetWorld(), Position, FVector(105), FColor(100, 100, 100, 100));
+					DrawDebugBox(GetWorld(), Position, FVector(50), FColor(100, 100, 100, 100));
 				}
 			}
 		}
