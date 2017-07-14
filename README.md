@@ -2,7 +2,7 @@
 Unreal Engine 4 procedural voxel terrian example (partially based on Transvoxel™ Algorithm by Eric Lengyel http://transvoxel.org/)
 This plugin provides tools to generate, visualize and in-game change volume terrain using voxels.
 
-**Master branch tested with Unreal Engine 4.15.0 [Windows 7 x64]**
+**Master branch tested with Unreal Engine 4.16.2 [Windows 7 x64]**
 
 ![Unreal Engine 4 voxel terrian](http://media.indiedb.com/images/games/1/51/50197/ezgif.com-video-to-gif_2.gif)
 
