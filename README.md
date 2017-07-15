@@ -30,7 +30,7 @@ This plugin provides tools to generate, visualize and in-game change volume terr
 # Download ()
 **Last stable version 0.0.10-pre-alpha. Tested with Unreal Engine 4.16.2**
 
-Download from my page on Patreon.com: https://goo.gl/VdBTFy
+Download from my patreon: https://goo.gl/uLmgcx
 
 
 # Controls
