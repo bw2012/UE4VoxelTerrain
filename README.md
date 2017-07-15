@@ -27,7 +27,7 @@ This plugin provides tools to generate, visualize and in-game change volume terr
 4. Open directory UE4VoxelTerrain
 5. Open project file with Unreal Engine 4.15
 
-# Download ()
+# Download 
 **Last stable version 0.0.10-pre-alpha. Tested with Unreal Engine 4.16.2**
 
 Download from my patreon: https://goo.gl/uLmgcx
