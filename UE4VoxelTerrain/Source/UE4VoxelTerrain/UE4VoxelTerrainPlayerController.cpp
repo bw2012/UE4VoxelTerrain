@@ -5,6 +5,7 @@
 #include "AI/Navigation/NavigationSystem.h"
 #include "SandboxTerrainController.h"
 #include "SandboxCharacter.h"
+#include "VoxelIndex.h"
 
 AUE4VoxelTerrainPlayerController::AUE4VoxelTerrainPlayerController() {
 	tool_mode = 1;
@@ -46,10 +47,11 @@ void AUE4VoxelTerrainPlayerController::OnAltActionPressed() {
 		ASandboxTerrainController* terrain = Cast<ASandboxTerrainController>(Hit.Actor.Get());
 		if (terrain != NULL) {
 			FVector RegionIndex = terrain->GetRegionIndex(Hit.ImpactPoint);
-			FVector ZoneIndex = terrain->GetZoneIndex(Hit.ImpactPoint);
+			TVoxelIndex ZoneIndex = terrain->GetZoneIndex(Hit.ImpactPoint);
+			FVector ZoneIndexTmp(ZoneIndex.X, ZoneIndex.Y, ZoneIndex.Z);
 
 			UE_LOG(LogTemp, Warning, TEXT("rIndex -> %f %f %f"), RegionIndex.X, RegionIndex.Y, RegionIndex.Z);
-			UE_LOG(LogTemp, Warning, TEXT("zIndex -> %f %f %f"), ZoneIndex.X, ZoneIndex.Y, ZoneIndex.Z);
+			UE_LOG(LogTemp, Warning, TEXT("zIndex -> %f %f %f"), ZoneIndexTmp.X, ZoneIndexTmp.Y, ZoneIndexTmp.Z);
 
 			if (tool_mode == 1) {
 				terrain->DigTerrainRoundHole(Hit.ImpactPoint, 80, 5);
