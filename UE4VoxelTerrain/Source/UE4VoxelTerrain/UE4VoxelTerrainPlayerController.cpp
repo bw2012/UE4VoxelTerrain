@@ -46,11 +46,9 @@ void AUE4VoxelTerrainPlayerController::OnAltActionPressed() {
 		UE_LOG(LogTemp, Warning, TEXT("test point -> %f %f %f"), Hit.ImpactPoint.X, Hit.ImpactPoint.Y, Hit.ImpactPoint.Z);
 		ASandboxTerrainController* terrain = Cast<ASandboxTerrainController>(Hit.Actor.Get());
 		if (terrain != NULL) {
-			FVector RegionIndex = terrain->GetRegionIndex(Hit.ImpactPoint);
 			TVoxelIndex ZoneIndex = terrain->GetZoneIndex(Hit.ImpactPoint);
 			FVector ZoneIndexTmp(ZoneIndex.X, ZoneIndex.Y, ZoneIndex.Z);
 
-			UE_LOG(LogTemp, Warning, TEXT("rIndex -> %f %f %f"), RegionIndex.X, RegionIndex.Y, RegionIndex.Z);
 			UE_LOG(LogTemp, Warning, TEXT("zIndex -> %f %f %f"), ZoneIndexTmp.X, ZoneIndexTmp.Y, ZoneIndexTmp.Z);
 
 			if (tool_mode == 1) {
