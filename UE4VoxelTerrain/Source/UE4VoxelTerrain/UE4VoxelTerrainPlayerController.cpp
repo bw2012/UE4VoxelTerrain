@@ -57,7 +57,7 @@ void AUE4VoxelTerrainPlayerController::OnAltActionPressed() {
 			}
 
 			if (tool_mode == 2) {
-				terrain->DigTerrainCubeHole(Hit.ImpactPoint, 110, 5);
+				terrain->DigTerrainCubeHole(Hit.ImpactPoint, 110);
 			}
 
 			if (tool_mode == 3) {
@@ -68,7 +68,7 @@ void AUE4VoxelTerrainPlayerController::OnAltActionPressed() {
 				Tmp *= GridRange;
 				FVector Position((int)Tmp.X, (int)Tmp.Y, (int)Tmp.Z);
 
-				terrain->DigTerrainCubeHole(Position, 110, 5);
+				terrain->DigTerrainCubeHole(Position, 110);
 			}
 
 			if (tool_mode == 4) {
