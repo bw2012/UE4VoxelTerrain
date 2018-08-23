@@ -2,7 +2,6 @@
 
 #include "UE4VoxelTerrain.h"
 #include "UE4VoxelTerrainPlayerController.h"
-#include "AI/Navigation/NavigationSystem.h"
 #include "SandboxTerrainController.h"
 #include "SandboxCharacter.h"
 #include "VoxelIndex.h"
