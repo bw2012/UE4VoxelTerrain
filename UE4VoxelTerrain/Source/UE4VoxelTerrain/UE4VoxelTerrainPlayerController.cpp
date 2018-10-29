@@ -5,6 +5,7 @@
 #include "SandboxTerrainController.h"
 #include "SandboxCharacter.h"
 #include "VoxelIndex.h"
+#include "VoxelDualContouringMeshComponent.h"
 
 AUE4VoxelTerrainPlayerController::AUE4VoxelTerrainPlayerController() {
 	tool_mode = 1;
@@ -38,11 +39,19 @@ void AUE4VoxelTerrainPlayerController::OnMainActionReleased() {
 
 void AUE4VoxelTerrainPlayerController::OnAltActionPressed() {
 	ASandboxCharacter* pawn = Cast<ASandboxCharacter>(GetCharacter());
-
 	FHitResult Hit = TracePlayerActionPoint();
 
 	if (Hit.bBlockingHit) {
 		UE_LOG(LogTemp, Warning, TEXT("test point -> %f %f %f"), Hit.ImpactPoint.X, Hit.ImpactPoint.Y, Hit.ImpactPoint.Z);
+
+		
+		UVoxelDualContouringMeshComponent* DualContouringVoxelMesh = Cast<UVoxelDualContouringMeshComponent>(Hit.Component.Get());
+		if (DualContouringVoxelMesh != nullptr) {
+			if (tool_mode == 1) {
+				DualContouringVoxelMesh->EditMeshDeleteSphere(Hit.ImpactPoint, 80, 5);
+			}
+		}
+		
 		ASandboxTerrainController* terrain = Cast<ASandboxTerrainController>(Hit.Actor.Get());
 		if (terrain != NULL) {
 			TVoxelIndex ZoneIndex = terrain->GetZoneIndex(Hit.ImpactPoint);
