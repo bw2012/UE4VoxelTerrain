@@ -19,7 +19,6 @@ This plugin provides tools to generate, visualize and in-game change volume terr
 
 # Attention
 * This project uses git submodules. Make sure that project are cloned properly and folder UE4VoxelTerrain/Plugins is not empty.
-* If you have not idea that means 'git submodules' and 'clone recursive' just download last stable version (see link below). 
 * Work in progress. Some features is not finished/buggy/has ugly code/do not meet your expectations.
 
 # Usage
