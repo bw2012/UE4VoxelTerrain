@@ -22,7 +22,7 @@ This plugin provides tools to generate, visualize and in-game change volume terr
 * Work in progress. Some features is not finished/buggy/has ugly code/do not meet your expectations.
 
 # Usage
-1. Install MS Visual Studio 2015 Update 3
+1. Install MS Visual Studio 2017
 2. Download last stable project 
 3. Or clone repository properly ```git clone --recursive https://github.com/bw2012/UE4VoxelTerrain.git```
 4. Open directory UE4VoxelTerrain
@@ -30,8 +30,3 @@ This plugin provides tools to generate, visualize and in-game change volume terr
 
 # License
 MIT license
-
-# Support project
-BTC: 16k8NUyuMQFD9exynb4C6wCYLvd6gpHWnv
-
-![BTC](https://raw.githubusercontent.com/bw2012/UE4VoxelTerrain/master/btc-qr-code.gif)
