@@ -11,6 +11,9 @@ Saved
 .codelite
 .kdev4
 .clang
+.vs
+*.db
+*.ipch
 
 UE4VoxelTerrain.VC.VC.opendb
 UE4VoxelTerrain.VC.db

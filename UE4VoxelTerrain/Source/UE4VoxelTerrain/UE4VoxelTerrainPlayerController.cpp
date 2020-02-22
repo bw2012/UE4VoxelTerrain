@@ -179,7 +179,6 @@ FHitResult AUE4VoxelTerrainPlayerController::TracePlayerActionPoint() {
 		const FVector EndTrace = StartTrace + (Direction * MaxUseDistance);
 
 		FCollisionQueryParams TraceParams(FName(TEXT("")), true, this);
-		TraceParams.bTraceAsyncScene = true;
 		TraceParams.bReturnPhysicalMaterial = false;
 		TraceParams.bTraceComplex = true;
 		TraceParams.AddIgnoredActor(pawn);
