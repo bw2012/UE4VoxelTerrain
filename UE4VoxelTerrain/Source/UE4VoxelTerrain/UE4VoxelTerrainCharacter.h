@@ -13,6 +13,10 @@ public:
 	AUE4VoxelTerrainCharacter();
 
 	virtual void Tick(float DeltaSeconds) override;
+    
+    UPROPERTY(EditAnywhere, Category = "Sandbox")
+    UBlueprint* TestObject;
+    
 
 private:
 

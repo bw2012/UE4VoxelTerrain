@@ -1,4 +1,4 @@
-// Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
+﻿// Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
 
 #include "UE4VoxelTerrain.h"
 #include "UE4VoxelTerrainPlayerController.h"
@@ -7,8 +7,20 @@
 #include "VoxelIndex.h"
 #include "VoxelDualContouringMeshComponent.h"
 
+#include "SpawnHelper.hpp"
+
+// test only
+#include "SandboxObject.h"
+#include "BaseCharacter.h"
+#include "DrawDebugHelpers.h"
+
+
+#define DIG_CUBE_SIZE 110 //60
+#define DIG_CUBE_SNAP_TO_GRID 100 //50
+
 AUE4VoxelTerrainPlayerController::AUE4VoxelTerrainPlayerController() {
-	tool_mode = 1;
+	DiggingToolMode = 0;
+	bIsConstructionMode = false;
 }
 
 void AUE4VoxelTerrainPlayerController::PlayerTick(float DeltaTime) {
@@ -18,15 +30,6 @@ void AUE4VoxelTerrainPlayerController::PlayerTick(float DeltaTime) {
 void AUE4VoxelTerrainPlayerController::SetupInputComponent() {
 	// set up gameplay key bindings
 	Super::SetupInputComponent();
-
-	InputComponent->BindAction("0", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::setTool0);
-	InputComponent->BindAction("1", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::setTool1);
-	InputComponent->BindAction("2", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::setTool2);
-	InputComponent->BindAction("3", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::setTool3);
-	InputComponent->BindAction("4", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::setTool4);
-	InputComponent->BindAction("5", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::setTool5);
-	InputComponent->BindAction("6", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::setTool6);
-	InputComponent->BindAction("7", IE_Pressed, this, &AUE4VoxelTerrainPlayerController::setTool7);
 }
 
 void AUE4VoxelTerrainPlayerController::OnMainActionPressed() {
@@ -37,21 +40,82 @@ void AUE4VoxelTerrainPlayerController::OnMainActionReleased() {
 	SetDestinationReleased();
 }
 
+void DigTerrain() {
+
+}
+
+ASandboxObject* AUE4VoxelTerrainPlayerController::GetCurrentInventoryObject() {
+	UContainerComponent* Inventory = GetInventory();
+	if (Inventory != nullptr) {
+		FContainerStack* Stack = Inventory->GetSlot(CurrentInventorySlot);
+		if (Stack != nullptr) {
+			if (Stack->Amount > 0) {
+				TSubclassOf<ASandboxObject>	ObjectClass = Stack->ObjectClass;
+				if (ObjectClass != nullptr) {
+					ASandboxObject* Actor = Cast<ASandboxObject>(ObjectClass->ClassDefaultObject);
+					return Actor;
+				}
+			}
+		}
+	}
+
+	return nullptr;
+}
+
 void AUE4VoxelTerrainPlayerController::OnAltActionPressed() {
-	ASandboxCharacter* pawn = Cast<ASandboxCharacter>(GetCharacter());
+	ABaseCharacter* Character = Cast<ABaseCharacter>(GetCharacter());
+	if (Character->IsDead()) return;
+
 	FHitResult Hit = TracePlayerActionPoint();
 
 	if (Hit.bBlockingHit) {
 		UE_LOG(LogTemp, Warning, TEXT("test point -> %f %f %f"), Hit.ImpactPoint.X, Hit.ImpactPoint.Y, Hit.ImpactPoint.Z);
 
-		
-		UVoxelDualContouringMeshComponent* DualContouringVoxelMesh = Cast<UVoxelDualContouringMeshComponent>(Hit.Component.Get());
-		if (DualContouringVoxelMesh != nullptr) {
-			if (tool_mode == 1) {
-				DualContouringVoxelMesh->EditMeshDeleteSphere(Hit.ImpactPoint, 80, 5);
+		if (bIsConstructionMode) {
+			ASandboxObject* Obj = GetCurrentInventoryObject();
+			if (IsCursorPositionValid(Hit) && Obj) {
+				FVector Location;
+				FRotator Rotation;
+
+				CalculateCursorPosition(Character, Hit, Location, Rotation, Obj);
+				SpawnSandboxObject(GetWorld(), Character, Location, Rotation, Obj);
+			}
+		} else {
+			ASandboxTerrainController* Terrain = Cast<ASandboxTerrainController>(Hit.Actor.Get());
+			if (Terrain) {
+				TVoxelIndex ZoneIndex = Terrain->GetZoneIndex(Hit.ImpactPoint);
+				FVector ZoneIndexTmp(ZoneIndex.X, ZoneIndex.Y, ZoneIndex.Z);
+				UE_LOG(LogTemp, Warning, TEXT("zIndex -> %f %f %f"), ZoneIndexTmp.X, ZoneIndexTmp.Y, ZoneIndexTmp.Z);
+
+				if (DiggingToolMode == 0) {
+					Terrain->DigTerrainRoundHole(Hit.ImpactPoint, 80, 5);
+					GetWorld()->GetTimerManager().SetTimer(Timer, this, &AUE4VoxelTerrainPlayerController::PerformAction, 0.1, true);
+				}
+
+				if (DiggingToolMode == 1) {
+					FVector Location = SnapToGrid(Hit.Location, DIG_CUBE_SNAP_TO_GRID);
+					Terrain->DigTerrainCubeHole(Location, DIG_CUBE_SIZE);
+
+					float test = 55;
+
+					FVector Min(-test);
+					FVector Max(test);
+					FBox Box(Min, Max);
+					//Terrain->DigTerrainCubeHole(Location, Box, -45, FVector(0, 0, 1));
+					//Terrain->DigTerrainCubeHole(Location, Box, 0, FVector(0, 0, 1));
+
+					ABaseCharacter* TestCharacter = Cast<ABaseCharacter>(GetCharacter());
+					if (TestCharacter) {
+						if (TestCharacter->TestSound) {
+							UGameplayStatics::PlaySoundAtLocation(GetWorld(), TestCharacter->TestSound, Hit.ImpactPoint, FRotator(0));
+						}
+					}
+				}
 			}
 		}
-		
+
+
+		/*
 		ASandboxTerrainController* terrain = Cast<ASandboxTerrainController>(Hit.Actor.Get());
 		if (terrain != NULL) {
 			TVoxelIndex ZoneIndex = terrain->GetZoneIndex(Hit.ImpactPoint);
@@ -59,13 +123,21 @@ void AUE4VoxelTerrainPlayerController::OnAltActionPressed() {
 
 			UE_LOG(LogTemp, Warning, TEXT("zIndex -> %f %f %f"), ZoneIndexTmp.X, ZoneIndexTmp.Y, ZoneIndexTmp.Z);
 
+			tool_mode = 3;
+
 			if (tool_mode == 1) {
 				terrain->DigTerrainRoundHole(Hit.ImpactPoint, 80, 5);
 				GetWorld()->GetTimerManager().SetTimer(timer, this, &AUE4VoxelTerrainPlayerController::PerformAction, 0.1, true);
 			}
 
 			if (tool_mode == 2) {
-				terrain->DigTerrainCubeHole(Hit.ImpactPoint, 110);
+                terrain->DigTerrainCubeHole(Hit.ImpactPoint, 110);
+				ABaseCharacter* TestCharacter = Cast<ABaseCharacter>(GetCharacter());
+				if (TestCharacter) {
+					if (TestCharacter->TestSound) {
+						UGameplayStatics::PlaySoundAtLocation(GetWorld(), TestCharacter->TestSound, Hit.ImpactPoint, FRotator(0));
+					}
+				}
 			}
 
 			if (tool_mode == 3) {
@@ -76,7 +148,16 @@ void AUE4VoxelTerrainPlayerController::OnAltActionPressed() {
 				Tmp *= GridRange;
 				FVector Position((int)Tmp.X, (int)Tmp.Y, (int)Tmp.Z);
 
-				terrain->DigTerrainCubeHole(Position, 110);
+				terrain->DigTerrainCubeHole(Position, 60);
+                
+                
+                FVector Min(-100, 0, 0);
+                FVector Max(100, 200, 100);
+                FBox Box(Min, Max);
+                //FTransform Transform(FQuat(FVector(1, 0, 0), -45), TraceHitResult.Location, FVector(1));
+                
+                //terrain->DigTerrainCubeHole(Hit.ImpactPoint, 110);
+                //terrain->DigTerrainCubeHole(Position, Box, -45, FVector(1, 0, 0));
 			}
 
 			if (tool_mode == 4) {
@@ -101,99 +182,61 @@ void AUE4VoxelTerrainPlayerController::OnAltActionPressed() {
 
 				terrain->FillTerrainCube(Position, 55, 4); // basalt
 			}
-		}
+		}*/
 	}
 }
 
 void AUE4VoxelTerrainPlayerController::OnAltActionReleased() {
-	GetWorld()->GetTimerManager().ClearTimer(timer);
-}
-
-void AUE4VoxelTerrainPlayerController::setTool0() {
-	tool_mode = 0;
-}
-
-void AUE4VoxelTerrainPlayerController::setTool1() {
-	tool_mode = 1;
-}
-
-void AUE4VoxelTerrainPlayerController::setTool2() {
-	tool_mode = 2;
-}
-
-void AUE4VoxelTerrainPlayerController::setTool3() {
-	tool_mode = 3;
-}
-
-void AUE4VoxelTerrainPlayerController::setTool4() {
-	tool_mode = 4;
-}
-
-void AUE4VoxelTerrainPlayerController::setTool5() {
-	tool_mode = 5;
-}
-
-void AUE4VoxelTerrainPlayerController::setTool6() {
-	tool_mode = 6;
-}
-
-void AUE4VoxelTerrainPlayerController::setTool7() {
-	tool_mode = 7;
+	GetWorld()->GetTimerManager().ClearTimer(Timer);
 }
 
 void AUE4VoxelTerrainPlayerController::PerformAction() {
-	ASandboxCharacter* pawn = Cast<ASandboxCharacter>(GetCharacter());
-	if (pawn->GetSandboxPlayerView() != PlayerView::TOP_DOWN) {
-		return;
-	}
+	ASandboxCharacter* Character = Cast<ASandboxCharacter>(GetCharacter());
+	if (Character->GetSandboxPlayerView() != PlayerView::TOP_DOWN) { return; }
 
 	FHitResult Hit;
 	GetHitResultUnderCursor(ECC_WorldStatic, false, Hit);
-
 	if (Hit.bBlockingHit) {
-		ASandboxTerrainController* terrain = Cast<ASandboxTerrainController>(Hit.Actor.Get());
-		if (terrain != NULL) {
-			if (tool_mode == 1) {
-				terrain->DigTerrainRoundHole(Hit.ImpactPoint, 80, 5);
+		ASandboxTerrainController* Terrain = Cast<ASandboxTerrainController>(Hit.Actor.Get());
+		if (Terrain) {
+			if (DiggingToolMode == 0) {
+				Terrain->DigTerrainRoundHole(Hit.ImpactPoint, 80, 5);
 			}
 		}
 	}
 }
 
+void AUE4VoxelTerrainPlayerController::OnTracePlayerActionPoint(const FHitResult& Res) {
+	ABaseCharacter* Character = Cast<ABaseCharacter>(GetCharacter());
+	if (Character->IsDead()) return;
+	if (Character) {
+		ASandboxObject* Obj = GetCurrentInventoryObject();
+		if (bIsConstructionMode && IsCursorPositionValid(Res) && Obj) {
+			auto Mesh = Obj->SandboxRootMesh->GetStaticMesh();
+			Character->CursorMesh->SetStaticMesh(Mesh);
+			Character->CursorMesh->SetVisibility(true, true);
 
-FHitResult AUE4VoxelTerrainPlayerController::TracePlayerActionPoint() {
-	ASandboxCharacter* pawn = Cast<ASandboxCharacter>(GetCharacter());
+			FVector Location;
+			FRotator Rotation;
+			CalculateCursorPosition(Character, Res, Location, Rotation, Obj);
+			Character->CursorMesh->SetWorldLocationAndRotationNoPhysics(Location, Rotation);
+		} else {
+			Character->CursorMesh->SetVisibility(false, true);
+			Character->CursorMesh->SetStaticMesh(nullptr);
 
-	if (pawn->GetSandboxPlayerView() == PlayerView::THIRD_PERSON) {
-		float MaxUseDistance = 800;
-		if (pawn->GetCameraBoom() != NULL) {
-			MaxUseDistance = pawn->GetCameraBoom()->TargetArmLength + 800;
+			if (!bIsConstructionMode) {
+				ASandboxTerrainController* TerrainController = Cast<ASandboxTerrainController>(Res.Actor.Get());
+				if (TerrainController) {
+					if (DiggingToolMode == 0) {
+						DrawDebugSphere(GetWorld(), Res.Location, 80, 24, FColor(255, 255, 255, 100));
+					}
+
+					if (DiggingToolMode == 1) {
+						FVector Location = SnapToGrid(Res.Location, DIG_CUBE_SNAP_TO_GRID);
+						DrawDebugBox(GetWorld(), Location, FVector(DIG_CUBE_SIZE), FColor(255, 255, 255, 100));
+					}
+				}
+			}
 		}
-
-		FVector CamLoc;
-		FRotator CamRot;
-		GetPlayerViewPoint(CamLoc, CamRot);
-
-		const FVector StartTrace = CamLoc;
-		const FVector Direction = CamRot.Vector();
-		const FVector EndTrace = StartTrace + (Direction * MaxUseDistance);
-
-		FCollisionQueryParams TraceParams(FName(TEXT("")), true, this);
-		TraceParams.bReturnPhysicalMaterial = false;
-		TraceParams.bTraceComplex = true;
-		TraceParams.AddIgnoredActor(pawn);
-
-		FHitResult Hit(ForceInit);
-		GetWorld()->LineTraceSingleByChannel(Hit, StartTrace, EndTrace, ECC_Visibility, TraceParams);
-
-		return Hit;
 	}
-
-	if (pawn->GetSandboxPlayerView() == PlayerView::TOP_DOWN) {
-		FHitResult Hit;
-		GetHitResultUnderCursor(ECC_Visibility, false, Hit);
-		return Hit;
-	}
-
-	return FHitResult();
 }

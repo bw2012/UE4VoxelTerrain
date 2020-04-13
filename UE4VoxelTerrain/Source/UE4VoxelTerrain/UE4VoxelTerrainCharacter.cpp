@@ -21,6 +21,7 @@ void AUE4VoxelTerrainCharacter::Tick(float DeltaSeconds) {
 	Super::Tick(DeltaSeconds);
 
 	//if (CursorToWorld != nullptr)
+	/*
 	{
 		if (AUE4VoxelTerrainPlayerController* PC = Cast<AUE4VoxelTerrainPlayerController>(GetController())) {
 			FHitResult TraceHitResult = PC->TracePlayerActionPoint();
@@ -48,6 +49,11 @@ void AUE4VoxelTerrainCharacter::Tick(float DeltaSeconds) {
 
 				if (controller->tool_mode == 2) {
 					DrawDebugBox(GetWorld(), TraceHitResult.Location, FVector(105), FColor(255, 255, 255, 100));
+                    //FVector Min(-110, -110, -110);
+                    //FVector Max(110, 110, 110);
+                    //FBox Box(Min, Max);
+                    //FTransform Transform(FQuat(FVector(1, 0, 0), -45), TraceHitResult.Location, FVector(1));
+                    //DrawDebugSolidBox(GetWorld(), Box, FColor(255, 255, 255, 100), Transform);
 				}
 
 				if (controller->tool_mode == 3) {
@@ -58,7 +64,8 @@ void AUE4VoxelTerrainCharacter::Tick(float DeltaSeconds) {
 					Tmp *= GridRange;
 					FVector Position((int)Tmp.X, (int)Tmp.Y, (int)Tmp.Z);
 
-					DrawDebugBox(GetWorld(), Position, FVector(100), FColor(255, 255, 255, 100));
+                    FQuat Rotation;
+					DrawDebugBox(GetWorld(), Position, FVector(100), Rotation, FColor(255, 255, 255, 100));
 				}
 
 				if (controller->tool_mode == 4) {
@@ -86,5 +93,6 @@ void AUE4VoxelTerrainCharacter::Tick(float DeltaSeconds) {
 			}
 		}
 	}
+	*/
 }
 

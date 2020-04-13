@@ -1,0 +1,8 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#include "UE4VoxelTerrain.h"
+#include "CubeObject.h"
+
+uint64 ACubeObject::GetSandboxTypeId() {
+	return 10; // construction
+}

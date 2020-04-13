@@ -13,6 +13,12 @@ class AUE4VoxelTerrainPlayerController : public ASandboxPlayerController
 public:
 	AUE4VoxelTerrainPlayerController();
 
+	UFUNCTION(BlueprintCallable, Category = "Sandbox")
+	void ToggleConstructionMode() { bIsConstructionMode = !bIsConstructionMode;  };
+
+	UFUNCTION(BlueprintCallable, Category = "Sandbox")
+	void ToggleToolMode() { DiggingToolMode++; DiggingToolMode = DiggingToolMode % 2; };
+
 protected:
 
 	virtual void PlayerTick(float DeltaTime) override;
@@ -29,32 +35,19 @@ protected:
 
 	void PerformAction();
 
+	virtual void OnTracePlayerActionPoint(const FHitResult& Res) override;
+
 public:
 
-	int tool_mode = 0;
-
-	FHitResult TracePlayerActionPoint();
+	int DiggingToolMode = 0;
 
 private:
 
-	FTimerHandle timer;
+	bool bIsConstructionMode;
 
-	void setTool0();
-	
-	void setTool1();
+	FTimerHandle Timer;
 
-	void setTool2();
-
-	void setTool3();
-
-	void setTool4();
-
-	void setTool5();
-
-	void setTool6();
-
-	void setTool7();
-
+	ASandboxObject* GetCurrentInventoryObject();
 };
 
 
