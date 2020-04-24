@@ -12,6 +12,7 @@ void ATerrainGenerator::StartTerrainGeneration() {
 		UE_LOG(LogTemp, Warning, TEXT("ATerrainGenerator::StartTerrainGeneration()"));
 		bIsGenerationStarted = true;
 
+		/*
 		if (ASandboxTerrainController::OpenFile()) {
 			ASandboxTerrainController::RunLoadMapAsync([&](){
 				UE_LOG(LogTemp, Warning, TEXT("TEST"));
@@ -19,6 +20,7 @@ void ATerrainGenerator::StartTerrainGeneration() {
 				FFunctionGraphTask::CreateAndDispatchWhenReady([=]() { GetWorld()->ServerTravel(FString("/Game/Test/TestMap"));  }, TStatId(), nullptr, ENamedThreads::GameThread);
 			});
 		}
+		*/
 	}
 	GenerateTerrainMutex.Unlock();
 }

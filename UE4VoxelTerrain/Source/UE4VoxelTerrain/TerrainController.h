@@ -21,5 +21,8 @@ public:
 
 protected:
 
+	virtual float GeneratorDensityFunc(const TVoxelDensityFunctionData& FunctionData);
+
+	virtual bool GeneratorForcePerformZone(const TVoxelIndex& ZoneIndex) override;
 
 };

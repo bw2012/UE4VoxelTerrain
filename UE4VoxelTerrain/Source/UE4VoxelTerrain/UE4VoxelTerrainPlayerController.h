@@ -2,6 +2,7 @@
 #pragma once
 #include "GameFramework/PlayerController.h"
 #include "SandboxPlayerController.h"
+#include "SandboxEnvironment.h"
 #include "UE4VoxelTerrainPlayerController.generated.h"
 
 
@@ -18,6 +19,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Sandbox")
 	void ToggleToolMode() { DiggingToolMode++; DiggingToolMode = DiggingToolMode % 2; };
+
+	virtual void BeginPlay() override;
 
 protected:
 
@@ -43,11 +46,15 @@ public:
 
 private:
 
+	ASandboxEnvironment* SandboxEnvironment;
+
 	bool bIsConstructionMode;
 
 	FTimerHandle Timer;
 
 	ASandboxObject* GetCurrentInventoryObject();
+
+	FVector PrevLocation;
 };
 
 

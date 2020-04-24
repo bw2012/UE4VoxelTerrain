@@ -23,8 +23,40 @@ AUE4VoxelTerrainPlayerController::AUE4VoxelTerrainPlayerController() {
 	bIsConstructionMode = false;
 }
 
+void AUE4VoxelTerrainPlayerController::BeginPlay() {
+	Super::BeginPlay();
+
+	for (TActorIterator<ASandboxEnvironment> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
+		ASandboxEnvironment* Env = Cast<ASandboxEnvironment>(*ActorItr);
+		if (Env) {
+			UE_LOG(LogTemp, Log, TEXT("Found ASandboxEnvironment -> %s"), *Env->GetName());
+			SandboxEnvironment = Env;
+			break;
+		}
+	}
+}
+
 void AUE4VoxelTerrainPlayerController::PlayerTick(float DeltaTime) {
 	Super::PlayerTick(DeltaTime);
+
+	ABaseCharacter* Character = Cast<ABaseCharacter>(GetCharacter());
+	if (Character) {
+		FVector Location = Character->GetActorLocation();
+		const float Distance = FVector::Distance(Location, PrevLocation);
+		if (Distance > 50) {
+			PrevLocation = Location;
+			// update player position
+			SandboxEnvironment->UpdatePlayerPosition(Location);
+
+			if (Location.Z < -500) {
+				if (SandboxEnvironment) {
+					SandboxEnvironment->SetCaveMode(true);
+				} else {
+					SandboxEnvironment->SetCaveMode(false);
+				}
+			}
+		}
+	}
 }
 
 void AUE4VoxelTerrainPlayerController::SetupInputComponent() {
@@ -38,10 +70,6 @@ void AUE4VoxelTerrainPlayerController::OnMainActionPressed() {
 
 void AUE4VoxelTerrainPlayerController::OnMainActionReleased() {
 	SetDestinationReleased();
-}
-
-void DigTerrain() {
-
 }
 
 ASandboxObject* AUE4VoxelTerrainPlayerController::GetCurrentInventoryObject() {
