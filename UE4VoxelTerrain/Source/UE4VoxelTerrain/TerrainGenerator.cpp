@@ -6,25 +6,54 @@
 
 
 
-void ATerrainGenerator::StartTerrainGeneration() {
+void ATerrainGenerator::StartBuildingTerrain() {
 	GenerateTerrainMutex.Lock();
-	if (!bIsGenerationStarted) {
-		UE_LOG(LogTemp, Warning, TEXT("ATerrainGenerator::StartTerrainGeneration()"));
-		bIsGenerationStarted = true;
 
-		/*
-		if (ASandboxTerrainController::OpenFile()) {
-			ASandboxTerrainController::RunLoadMapAsync([&](){
-				UE_LOG(LogTemp, Warning, TEXT("TEST"));
-				//GetWorld()->ServerTravel(FString("/Game/Test/TestMap"));
-				FFunctionGraphTask::CreateAndDispatchWhenReady([=]() { GetWorld()->ServerTravel(FString("/Game/Test/TestMap"));  }, TStatId(), nullptr, ENamedThreads::GameThread);
-			});
+	if (!bIsGenerationStarted) {
+		bool bShouldGenerateTerrain = true;
+		bool bIsMapJsonLoaded = LoadJson();
+		if (bIsMapJsonLoaded) {
+			FString MapStatus = MapInfo.Status;
+			if (MapStatus == "generated") {
+				bShouldGenerateTerrain = false;
+			}
 		}
-		*/
+
+		if (bShouldGenerateTerrain) {
+			// start map generation pipeline
+			bIsGenerationStarted = true;
+
+			RunGenerateTerrainPipeline([=] {
+				FinishGenerationPipeline();
+			}, [=](uint32 Progress, uint32 Total) {
+				ProgressGenerationPipeline(Progress, Total);
+			});
+		} else {
+			FinishGenerationPipeline(); 
+		}
 	}
+
 	GenerateTerrainMutex.Unlock();
 }
 
-void ATerrainGenerator::BeginPlayServer() {
+
+void ATerrainGenerator::ProgressGenerationPipeline(uint32 Progress, uint32 Total) {
+	float PercentProgress = (float)Progress / (float)Total;
+	//UE_LOG(LogTemp, Warning, TEXT("ATerrainGenerator::ProgressGenerationPipeline() %d %d %f"), Progress, Total, PercentProgress);
+	AsyncTask(ENamedThreads::GameThread, [=]() {
+		OnProgressBuildingTerrain(PercentProgress);
+	});
+}
+
+void ATerrainGenerator::FinishGenerationPipeline() {
+	MapInfo.Status = "generated";
+
+	AsyncTask(ENamedThreads::GameThread, [&]() {
+		UE_LOG(LogTemp, Warning, TEXT("ATerrainGenerator::OnFinishBuildingTerrain()"));
+		OnFinishBuildingTerrain();
+	});
+}
+
+void ATerrainGenerator::BeginTerrainLoad() {
 	bIsGenerationStarted = false;
 }

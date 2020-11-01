@@ -3,29 +3,36 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SandboxTerrainController.h"
+#include "TerrainController.h"
 #include "TerrainGenerator.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class UE4VOXELTERRAIN_API ATerrainGenerator : public ASandboxTerrainController {
+class UE4VOXELTERRAIN_API ATerrainGenerator : public ATerrainController {
 	GENERATED_BODY()
 	
 public:
-		UFUNCTION(BlueprintCallable, Category = "UnrealSandbox")
-		void StartTerrainGeneration();
+	UFUNCTION(BlueprintCallable, Category = "UnrealSandbox")
+	void StartBuildingTerrain();
 
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "On Finish Build Sandbox Terrain"))
+	void OnFinishBuildingTerrain();
+
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "On Progress Build Sandbox Terrain"))
+	void OnProgressBuildingTerrain(float Progress);
 
 protected:
 
-	virtual void BeginPlayServer();
+	virtual void BeginTerrainLoad() override;
 
 private:
 
+	void FinishGenerationPipeline();
+
+	void ProgressGenerationPipeline(uint32 Progress, uint32 Total);
+
 	FCriticalSection GenerateTerrainMutex;
 	bool bIsGenerationStarted;
-
-
 };

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "SandboxTerrainController.h"
+#include "LevelController.h"
 #include "TerrainController.generated.h"
 
 /**
@@ -16,8 +17,8 @@ class UE4VOXELTERRAIN_API ATerrainController : public ASandboxTerrainController
 	
 public:
 
-	int32 ZoneLoaderConter = 0;
-	int32 ZoneLoaderTotal = 0;
+	UPROPERTY(EditAnywhere, Category = "UnrealSandbox Toolkit")
+	ALevelController* LevelController;
 
 protected:
 
@@ -25,4 +26,11 @@ protected:
 
 	virtual bool GeneratorForcePerformZone(const TVoxelIndex& ZoneIndex) override;
 
+	virtual void OnOverlapActorDuringTerrainEdit(const FHitResult& OverlapResult, const FVector& Pos) override;
+
+	virtual FSandboxFoliage GeneratorFoliageOverride(const int32 FoliageTypeId, const FSandboxFoliage& FoliageType, const TVoxelIndex& ZoneIndex, const FVector& WorldPos) override;
+
+	virtual bool GeneratorUseCustomFoliage(const TVoxelIndex& Index);
+
+	virtual bool GeneratorSpawnCustomFoliage(const TVoxelIndex& Index, const FVector& WorldPos, int32 FoliageTypeId, FSandboxFoliage FoliageType, FRandomStream& Rnd, FTransform& Transform);
 };

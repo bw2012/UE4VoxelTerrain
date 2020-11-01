@@ -7,14 +7,6 @@
 #include "BaseCharacter.h"
 
 
-FVector SnapToGrid(const FVector& Location, const float GridRange) {
-	FVector Tmp(Location);
-	Tmp /= GridRange;
-	Tmp.Set(std::round(Tmp.X), std::round(Tmp.Y), std::round(Tmp.Z));
-	Tmp *= GridRange;
-	return FVector((int)Tmp.X, (int)Tmp.Y, (int)Tmp.Z);
-}
-
 bool IsCursorPositionValid(const FHitResult& Hit) {
 	if (Hit.bBlockingHit) {
 		ACharacter* Character = Cast<ACharacter>(Hit.Actor);
@@ -28,21 +20,30 @@ bool IsCursorPositionValid(const FHitResult& Hit) {
 	return false;
 }
 
-void TransformPos(FVector& Pos, FRotator& Rotation, const FHitResult& TraceResult) {
-	ASandboxObject* SandboxObject = Cast<ASandboxObject>(TraceResult.Actor);
-	if (SandboxObject && SandboxObject->GetSandboxTypeId() == 10) {
-		FVector TargetActorPos = TraceResult.Actor->GetActorLocation();
-		Pos = TargetActorPos;
-		Rotation = TraceResult.Actor->GetActorRotation();
+void TransformPos(ASandboxObject* NewObj, FVector& Pos, FRotator& Rotation, const FHitResult& TraceResult) {
+	ASandboxObject* TargetObject = Cast<ASandboxObject>(TraceResult.Actor);
 
-		FVector Normal = TraceResult.ImpactNormal;
-		Pos = Pos + (Normal * 60);
+	// cube
+	if (NewObj->GetSandboxTypeId() == 10) {
+		if (TargetObject && TargetObject->GetSandboxTypeId() == 10) {
+			FVector TargetActorPos = TraceResult.Actor->GetActorLocation();
+			Pos = TargetActorPos;
+			Rotation = TraceResult.Actor->GetActorRotation();
+
+			FVector Normal = TraceResult.ImpactNormal;
+			Pos = Pos + (Normal * 60);
+		} else {
+			FVector Normal = TraceResult.ImpactNormal;
+			Pos = Pos + (Normal * 30);
+		}
+
+		return;
 	}
+	
 }
 
-void CalculateCursorPosition(ABaseCharacter* Character, const FHitResult& Res, FVector& Location, FRotator& Rotation, ASandboxObject* Obj) {
+void CalculateTargetRotation(ABaseCharacter* Character, FRotator& Rotation) {
 	if (Character->GetSandboxPlayerView() == PlayerView::TOP_DOWN) {
-		Location = Res.Location;
 		Rotation = FRotator();
 	}
 
@@ -50,22 +51,23 @@ void CalculateCursorPosition(ABaseCharacter* Character, const FHitResult& Res, F
 		FRotator Rot = Character->FollowCamera->GetComponentRotation();
 		Rot.Pitch = 0;
 		Rot.Roll = 0;
-		Location = Res.Location;
 		Rotation = Rot;
 	}
 
 	if (Character->GetSandboxPlayerView() == PlayerView::FIRST_PERSON) {
 		FRotator Rot = Character->GetCapsuleComponent()->GetComponentRotation();
-		Location = Res.Location;
 		Rotation = Rot;
-	}
-
-	if (Obj->GetSandboxTypeId() == 10) { // cube + cube
-		TransformPos(Location, Rotation, Res);
 	}
 }
 
-void DigTerrainAround(ASandboxObject* Object, UWorld* World, FVector Pos) {
+void CalculateCursorPosition(ABaseCharacter* Character, const FHitResult& Res, FVector& Location, FRotator& Rotation, ASandboxObject* Obj) {
+	Location = Res.Location;
+	CalculateTargetRotation(Character, Rotation);
+	TransformPos(Obj, Location, Rotation, Res);
+}
+
+
+void DigTerrainAround(ASandboxObject* Object, UWorld* World, const FVector& Pos, const FRotator& Rotator) {
 	TArray<UStaticMeshComponent*> Components;
 	Object->GetComponents<UStaticMeshComponent>(Components);
 	for (UStaticMeshComponent* StaticMeshComponent : Components) {
@@ -75,12 +77,13 @@ void DigTerrainAround(ASandboxObject* Object, UWorld* World, FVector Pos) {
 		for (auto& Overlap : OverlapArray) {
 			ASandboxTerrainController* Terrain = Cast<ASandboxTerrainController>(Overlap.Actor.Get());
 			if (Terrain) {
-				Terrain->DigTerrainCubeHole(Pos, 30);
+				Terrain->DigTerrainCubeHole(Pos, 30, Rotator);
 				continue;
 			}
 		}
 	}
 }
+
 
 FRotator SelectRotation() {
 	const auto DirIndex = FMath::RandRange(0, 6);
@@ -92,23 +95,71 @@ FRotator SelectRotation() {
 
 
 void SpawnSandboxObject(UWorld* World, ASandboxCharacter* Owner, const FVector& Location, const FRotator& Rotation, ASandboxObject* Object) {
-	//UE_LOG(LogTemp, Warning, TEXT("test actor -> %s"), *Test);
-	//UE_LOG(LogTemp, Warning, TEXT("test normal -> %f %f %f"), TraceResult.ImpactNormal.X, TraceResult.ImpactNormal.Y, TraceResult.ImpactNormal.Z);
-
 	auto SpawnActorClass = Object->GetClass();
 	if (SpawnActorClass) {
-		if (Object->GetSandboxTypeId() == 10) {
-			//DigTerrainAround(Object, World, Location);
-		}
-
 		FRotator RotationExt;
 		if (Object->GetSandboxTypeId() == 10) {
 			RotationExt = SelectRotation();
 		}
 
 		RotationExt += Rotation;
+
+		if (Object->GetSandboxTypeId() == 10) {
+			DigTerrainAround(Object, World, Location, RotationExt);
+		}
+
 		AActor* NewActor = World->SpawnActor(SpawnActorClass, &Location, &RotationExt);
 	}
-
-	return;
 };
+
+void DropSandboxObject(UWorld* World, ASandboxCharacter* Owner, ASandboxObject* Object) {
+	auto SpawnActorClass = Object->GetClass();
+	//const FRotator SpawnRotation = Owner->GetControlRotation();
+	const FRotator SpawnRotation = Owner->GetActorRotation();
+	const FVector SpawnLocation = Owner->GetActorLocation() + SpawnRotation.RotateVector(FVector(100, 0, 50));
+
+	FActorSpawnParameters ActorSpawnParams;
+	ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+
+	AActor* NewActor = World->SpawnActor(SpawnActorClass, &SpawnLocation, &SpawnRotation, ActorSpawnParams);
+	if (NewActor) {
+		UStaticMeshComponent* RootComponent = Cast<UStaticMeshComponent>(NewActor->GetRootComponent());
+		if (RootComponent) {
+			RootComponent->SetSimulatePhysics(true);
+			//RootComponent->SetMassScale(NAME_None, 2);
+			RootComponent->SetPhysicsLinearVelocity(SpawnRotation.RotateVector(FVector(500, 0, 0)));
+		}
+	}
+
+};
+
+
+
+void HelpDigStairs(const FVector& Location, const FRotator& PlayerRotation, TUniqueFunction<void(const FVector& TmpPos)> Function) {
+	FVector V = PlayerRotation.RotateVector(FVector(1, 0, 0));
+	V.Z = 0;
+	V.Normalize(0.001f);
+	V.X = FMath::RoundHalfToZero(V.X);
+	V.Y = FMath::RoundHalfToZero(V.Y);
+	V.Normalize(0.001f);
+
+	if (V.X == 0 && V.Y == 0) {
+		return;
+	}
+
+	float Test = FMath::Abs(FMath::Abs(V.X) - FMath::Abs(V.Y));
+
+	if (Test < 0.1f) {
+		return;
+	}
+
+	float Step = 25;
+	FVector Tmp(Location);
+	Tmp.Z += 150;
+	for (int i = 0; i < 5; i++) {
+		Tmp += V * 25 * 2;
+		Tmp.Z -= Step;
+		//DrawDebugBox(GetWorld(), Tmp, FVector(DIG_CUBE_SIZE), FColor(255, 255, 255, 100));
+		Function(Tmp);
+	}
+}

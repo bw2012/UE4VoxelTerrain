@@ -15,6 +15,4 @@ class UE4VOXELTERRAIN_API ACubeObject : public ASandboxObject {
 	
 public:
 
-	virtual uint64 GetSandboxTypeId();
-
 };

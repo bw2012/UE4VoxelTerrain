@@ -22,18 +22,10 @@ class UE4VOXELTERRAIN_API USystemInfoWidget : public UUserWidget
 	GENERATED_BODY()
 	
 protected:
-	UFUNCTION(BlueprintCallable, Category = "SandboxHUD")
-	FString sandboxSystemInfoText();
-
-	UFUNCTION(BlueprintCallable, Category = "SandboxHUD")
-	float sandboxSystemInfoPercent();
-
-	UFUNCTION(BlueprintCallable, Category = "SandboxHUD")
-	ESlateVisibility sandboxSystemInfoVisiblity();
+	UFUNCTION(BlueprintCallable, Category = "Sandbox System info")
+	FString SandboxVersionInfoText();
 	
 private:
-	ATerrainController* controller;
 
-	ATerrainController* getController();
 	
 };

@@ -3,6 +3,8 @@
 #include "GameFramework/PlayerController.h"
 #include "SandboxPlayerController.h"
 #include "SandboxEnvironment.h"
+#include "LevelController.h"
+#include "TerrainController.h"
 #include "UE4VoxelTerrainPlayerController.generated.h"
 
 
@@ -15,10 +17,7 @@ public:
 	AUE4VoxelTerrainPlayerController();
 
 	UFUNCTION(BlueprintCallable, Category = "Sandbox")
-	void ToggleConstructionMode() { bIsConstructionMode = !bIsConstructionMode;  };
-
-	UFUNCTION(BlueprintCallable, Category = "Sandbox")
-	void ToggleToolMode() { DiggingToolMode++; DiggingToolMode = DiggingToolMode % 2; };
+	void ToggleToolMode();
 
 	virtual void BeginPlay() override;
 
@@ -40,15 +39,21 @@ protected:
 
 	virtual void OnTracePlayerActionPoint(const FHitResult& Res) override;
 
-public:
-
-	int DiggingToolMode = 0;
 
 private:
 
+	UPROPERTY()
 	ASandboxEnvironment* SandboxEnvironment;
 
-	bool bIsConstructionMode;
+	UPROPERTY()
+	ALevelController* LevelController;
+
+	UPROPERTY()
+	ATerrainController* TerrainController;
+
+
+	//bool bIsConstructionMode;
+	bool bPlaceCurrentObjectToWorld;
 
 	FTimerHandle Timer;
 

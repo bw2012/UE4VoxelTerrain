@@ -3,6 +3,3 @@
 #include "UE4VoxelTerrain.h"
 #include "CubeObject.h"
 
-uint64 ACubeObject::GetSandboxTypeId() {
-	return 10; // construction
-}
