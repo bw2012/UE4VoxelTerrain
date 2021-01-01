@@ -97,7 +97,7 @@ FRotator SelectRotation() {
 void SpawnSandboxObject(UWorld* World, ASandboxCharacter* Owner, const FVector& Location, const FRotator& Rotation, ASandboxObject* Object) {
 	auto SpawnActorClass = Object->GetClass();
 	if (SpawnActorClass) {
-		FRotator RotationExt;
+		FRotator RotationExt(0);
 		if (Object->GetSandboxTypeId() == 10) {
 			RotationExt = SelectRotation();
 		}
