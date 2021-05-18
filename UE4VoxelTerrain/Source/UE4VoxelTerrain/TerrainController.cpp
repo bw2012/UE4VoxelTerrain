@@ -7,7 +7,7 @@
 #include "VoxelData.h"
 
 
-FORCEINLINE float ATerrainController::GeneratorDensityFunc(const TVoxelDensityFunctionData& FunctionData) {
+float ATerrainController::GeneratorDensityFunc(const TVoxelDensityFunctionData& FunctionData) {
 	const TVoxelIndex& ZoneIndex = FunctionData.ZoneIndex;
 	if (ZoneIndex.Z <= -2 && ZoneIndex.Z >= -4) {
 		const FVector& WorldPos = FunctionData.WorldPos;
@@ -118,7 +118,7 @@ FSandboxFoliage ATerrainController::GeneratorFoliageOverride(const int32 Foliage
 	return Foliage;
 }
 
-FORCEINLINE bool  ATerrainController::GeneratorUseCustomFoliage(const TVoxelIndex& ZoneIndex) {
+bool  ATerrainController::GeneratorUseCustomFoliage(const TVoxelIndex& ZoneIndex) {
 	if (ZoneIndex.Z <= -2 && ZoneIndex.Z >= -4) {
 		return true;
 	}
@@ -127,7 +127,7 @@ FORCEINLINE bool  ATerrainController::GeneratorUseCustomFoliage(const TVoxelInde
 }
 
 
-FORCEINLINE bool ATerrainController::GeneratorSpawnCustomFoliage(const TVoxelIndex& Index, const FVector& WorldPos, int32 FoliageTypeId, FSandboxFoliage FoliageType, FRandomStream& Rnd, FTransform& Transform) {
+bool ATerrainController::GeneratorSpawnCustomFoliage(const TVoxelIndex& Index, const FVector& WorldPos, int32 FoliageTypeId, FSandboxFoliage FoliageType, FRandomStream& Rnd, FTransform& Transform) {
 	FVector Pos = WorldPos;
 
 	// cave height
