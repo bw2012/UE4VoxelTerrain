@@ -2,7 +2,7 @@
 Unreal Engine 4 procedural voxel terrian example (partially based on Transvoxel™ Algorithm by Eric Lengyel http://transvoxel.org/)
 This plugin provides tools to generate, visualize and in-game change volume terrain using voxels.
 
-**Master branch tested with Unreal Engine 4.26 [Windows 7 x64, macOS Catalina 10.15.3]**
+**Master branch tested with Unreal Engine 4.26.2 [Windows 10]**
 **Work in progress**
 
 ![Unreal Engine 4 voxel terrian](https://github.com/bw2012/UE4VoxelTerrain/blob/master/terrain.gif?raw=true)
@@ -24,12 +24,13 @@ This plugin provides tools to generate, visualize and in-game change volume terr
 * Work in progress. Some features is not finished/buggy/has ugly code/do not meet your expectations.
 
 # Usage
-1. Install MS Visual Studio 2017
+1. Install MS Visual Studio 2019
 2. Download last stable project 
 3. Or clone repository properly ```git clone --recursive https://github.com/bw2012/UE4VoxelTerrain.git```
 4. Open directory UE4VoxelTerrain
 5. Download [Content.zip](https://drive.google.com/file/d/1nBXoLTTpq92ENEfLSIoFxh2cTe1AVGJ3/view?usp=sharingi) (1.2Gb) and unzip it to ```Content``` folder
 6. Open project file with Unreal Engine 4.26
+7. Wait for compile UE4 KiteDemo shaders (first run may take long time)
 
 # License
 MIT license
