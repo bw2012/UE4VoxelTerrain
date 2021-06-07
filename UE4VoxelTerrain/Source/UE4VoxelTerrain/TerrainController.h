@@ -17,20 +17,33 @@ class UE4VOXELTERRAIN_API ATerrainController : public ASandboxTerrainController
 	
 public:
 
+	UPROPERTY(EditAnywhere, Category = "UnrealSandbox Debug")
+	bool bUseCUDAGenerator = false;
+
 	UPROPERTY(EditAnywhere, Category = "UnrealSandbox Toolkit")
 	ALevelController* LevelController;
 
+
+public:
+
+	virtual void BeginPlay() override;
+
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	
+	bool IsUseCuda();
+
+	void* CudaGenVdPtr = nullptr; //FIXME
+
 protected:
 
-	virtual float GeneratorDensityFunc(const TVoxelDensityFunctionData& FunctionData);
+	virtual TBaseTerrainGenerator* NewTerrainGenerator() override;
 
-	virtual bool GeneratorForcePerformZone(const TVoxelIndex& ZoneIndex) override;
+	virtual void BatchGenerateNewVd(const TArray<TSpawnZoneParam>& GenerationList, TArray<TVoxelData*>& NewVdArray) override;
 
 	virtual void OnOverlapActorDuringTerrainEdit(const FHitResult& OverlapResult, const FVector& Pos) override;
 
-	virtual FSandboxFoliage GeneratorFoliageOverride(const int32 FoliageTypeId, const FSandboxFoliage& FoliageType, const TVoxelIndex& ZoneIndex, const FVector& WorldPos) override;
+private:
 
-	virtual bool GeneratorUseCustomFoliage(const TVoxelIndex& Index);
+	void* CudaGenDllHandle = nullptr;
 
-	virtual bool GeneratorSpawnCustomFoliage(const TVoxelIndex& Index, const FVector& WorldPos, int32 FoliageTypeId, FSandboxFoliage FoliageType, FRandomStream& Rnd, FTransform& Transform);
 };

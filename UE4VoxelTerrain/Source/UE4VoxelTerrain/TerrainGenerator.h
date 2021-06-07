@@ -14,6 +14,15 @@ class UE4VOXELTERRAIN_API ATerrainGenerator : public ATerrainController {
 	GENERATED_BODY()
 	
 public:
+
+
+	UPROPERTY(EditAnywhere, Category = "UnrealSandboxDebug")
+	int BatchSize = 10;
+
+	UPROPERTY(EditAnywhere, Category = "UnrealSandboxDebug")
+	int AreaGenerationSize = 10;
+
+
 	UFUNCTION(BlueprintCallable, Category = "UnrealSandbox")
 	void StartBuildingTerrain();
 
