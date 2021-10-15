@@ -64,10 +64,10 @@ void AUE4VoxelTerrainPlayerController::PlayerTick(float DeltaTime) {
 			SandboxEnvironment->UpdatePlayerPosition(Location);
 			if (SandboxEnvironment) {
 				if (Location.Z < -500) {
-					//UE_LOG(LogTemp, Log, TEXT("SetCaveMode = true"));
+					//UE_LOG(LogSandboxTerrain, Log, TEXT("SetCaveMode = true"));
 					SandboxEnvironment->SetCaveMode(true);
 				} else {
-					//UE_LOG(LogTemp, Log, TEXT("SetCaveMode = false"));
+					//UE_LOG(LogSandboxTerrain, Log, TEXT("SetCaveMode = false"));
 					SandboxEnvironment->SetCaveMode(false);
 				}
 			}
@@ -140,7 +140,7 @@ void AUE4VoxelTerrainPlayerController::OnAltActionPressed() {
 
 	FHitResult Hit = TracePlayerActionPoint();
 	if (Hit.bBlockingHit) {
-		//UE_LOG(LogTemp, Warning, TEXT("test point -> %f %f %f"), Hit.ImpactPoint.X, Hit.ImpactPoint.Y, Hit.ImpactPoint.Z);
+		//UE_LOG(LogSandboxTerrain, Warning, TEXT("test point -> %f %f %f"), Hit.ImpactPoint.X, Hit.ImpactPoint.Y, Hit.ImpactPoint.Z);
 
 		ASandboxObject* Obj = GetCurrentInventoryObject();
 		if (Obj) {
@@ -209,7 +209,7 @@ void AUE4VoxelTerrainPlayerController::OnTracePlayerActionPoint(const FHitResult
 		if (bPlaceCurrentObjectToWorld && IsCursorPositionValid(Res) && Obj) {
 			auto Mesh = Obj->SandboxRootMesh->GetStaticMesh();
 			FVector Scale = Obj->GetRootComponent()->GetRelativeScale3D();
-			UE_LOG(LogTemp, Warning, TEXT("Scale = %f %f %f"), Scale.X, Scale.Y, Scale.Z);
+			//UE_LOG(LogSandboxTerrain, Warning, TEXT("Scale = %f %f %f"), Scale.X, Scale.Y, Scale.Z);
 			BaseCharacter->CursorMesh->SetStaticMesh(Mesh);
 			BaseCharacter->CursorMesh->SetVisibility(true, true);
 			BaseCharacter->CursorMesh->SetRelativeScale3D(Scale);

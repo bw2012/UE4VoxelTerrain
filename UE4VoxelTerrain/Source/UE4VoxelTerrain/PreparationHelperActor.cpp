@@ -18,7 +18,7 @@ bool CheckSaveDirLocal(FString SaveDir) {
 		PlatformFile.CreateDirectory(*SaveDir);
 		UE_LOG(LogTemp, Log, TEXT("Create directory: %s"), *SaveDir);
 		if (!PlatformFile.DirectoryExists(*SaveDir)) {
-			UE_LOG(LogTemp, Warning, TEXT("Unable to create directory: %s"), *SaveDir);
+			UE_LOG(LogTemp, Log, TEXT("Unable to create directory: %s"), *SaveDir);
 			return false;
 		}
 	}

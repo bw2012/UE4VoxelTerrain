@@ -349,7 +349,7 @@ protected:
 				return;
 			}
 
-			UE_LOG(LogTemp, Warning, TEXT("Use CUDA: %d"), GenPass2List.Num());
+			UE_LOG(LogTemp, Log, TEXT("Use CUDA: %d"), GenPass2List.Num());
 
 			double Start = FPlatformTime::Seconds();
 
@@ -379,7 +379,7 @@ protected:
 			
 			double End = FPlatformTime::Seconds();
 			double Time = (End - Start) * 1000;
-			UE_LOG(LogTemp, Warning, TEXT("CudaResult -> %d ----> %f ms"), CudaResult, Time);
+			UE_LOG(LogTemp, Log, TEXT("CudaResult -> %d ----> %f ms"), CudaResult, Time);
 
 		} else {
 			TDefaultTerrainGenerator::BatchGenerateComplexVd(GenPass2List);
@@ -426,28 +426,28 @@ void ATerrainController::BeginPlay() {
 		if (FPaths::FileExists(CudaGenDllFilePath)) {
 			this->CudaGenDllHandle = FPlatformProcess::GetDllHandle(*CudaGenDllFilePath);
 			if (this->CudaGenDllHandle) {
-				UE_LOG(LogTemp, Warning, TEXT("CudaVdGenerator.dll -> LOADED"));
+				UE_LOG(LogTemp, Log, TEXT("CudaVdGenerator.dll -> LOADED"));
 
 				FString CudaGetInfoName = "CudaGetInfo";
 				PCudaGetInfo CudaGetInfo = (PCudaGetInfo)FPlatformProcess::GetDllExport(this->CudaGenDllHandle, *CudaGetInfoName);
 				if (CudaGetInfo) {
-					UE_LOG(LogTemp, Warning, TEXT("CudaGetInfo -> OK"));
+					UE_LOG(LogTemp, Log, TEXT("CudaGetInfo -> OK"));
 				}
 
 				FString CudaGenerateVdName = "CudaGenerateVd";
 				PCudaGenerateVd CudaGenerateVd = (PCudaGenerateVd)FPlatformProcess::GetDllExport(this->CudaGenDllHandle, *CudaGenerateVdName);
 				if (CudaGenerateVd) {
-					UE_LOG(LogTemp, Warning, TEXT("CudaGenerateVd -> OK"));
+					UE_LOG(LogTemp, Log, TEXT("CudaGenerateVd -> OK"));
 
 					CudaGenVdPtr = CudaGenerateVd;
 				}
 			}
 			else {
-				UE_LOG(LogTemp, Warning, TEXT("Error loading CudaVdGenerator.dll"));
+				UE_LOG(LogTemp, Log, TEXT("Error loading CudaVdGenerator.dll"));
 			}
 		}
 		else {
-			UE_LOG(LogTemp, Warning, TEXT("CudaVdGenerator.dll not found"));
+			UE_LOG(LogTemp, Log, TEXT("CudaVdGenerator.dll not found"));
 		}
 	}
 
@@ -459,7 +459,7 @@ void ATerrainController::EndPlay(const EEndPlayReason::Type EndPlayReason) {
 	Super::EndPlay(EndPlayReason);
 
 	if (this->CudaGenDllHandle) {
-		UE_LOG(LogTemp, Warning, TEXT("Free CudaVdGenerator.dll"));
+		UE_LOG(LogTemp, Log, TEXT("Free CudaVdGenerator.dll"));
 		FPlatformProcess::FreeDllHandle(CudaGenDllHandle);
 	}
 
