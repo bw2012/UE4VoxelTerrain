@@ -36,7 +36,7 @@ public:
 
 protected:
 
-	virtual TBaseTerrainGenerator* NewTerrainGenerator() override;
+	virtual UTerrainGeneratorComponent* NewTerrainGenerator() override;
 
 	virtual void BatchGenerateNewVd(const TArray<TSpawnZoneParam>& GenerationList, TArray<TVoxelData*>& NewVdArray) override;
 

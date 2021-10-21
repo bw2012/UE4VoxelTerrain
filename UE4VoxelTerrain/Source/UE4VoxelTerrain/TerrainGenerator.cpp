@@ -60,8 +60,8 @@ void ATerrainGenerator::StartBuildingTerrain() {
 				if ((Idx > 0 && Idx % BatchSize == 0) || (Idx == T-1)) {
 					double Start = FPlatformTime::Seconds();
 
-					GEngine->AddOnScreenDebugMessage(-1, MessageTime, FColor::Silver, FString::Printf(TEXT("%d / %d"), IdxB, MaxBatchCount));
-					UE_LOG(LogTemp, Log, TEXT("batch %d / %d"), IdxB, MaxBatchCount);
+					//GEngine->AddOnScreenDebugMessage(-1, MessageTime, FColor::Silver, FString::Printf(TEXT("%d / %d"), IdxB, MaxBatchCount));
+					//UE_LOG(LogTemp, Log, TEXT("batch %d / %d"), IdxB, MaxBatchCount);
 
 
 					TArray<TVoxelData*> NewVdArray;
@@ -69,9 +69,9 @@ void ATerrainGenerator::StartBuildingTerrain() {
 
 					double End = FPlatformTime::Seconds();
 					double Time = (End - Start) * 1000;
-					UE_LOG(LogTemp, Log, TEXT("batch generation ----> %f ms"), Time);
+					//UE_LOG(LogTemp, Log, TEXT("batch generation ----> %f ms"), Time);
 
-					GEngine->AddOnScreenDebugMessage(-1, MessageTime, FColor::Silver, FString::Printf(TEXT("Save terrain...")));
+					//GEngine->AddOnScreenDebugMessage(-1, MessageTime, FColor::Silver, FString::Printf(TEXT("Save terrain...")));
 
 					int Idx2 = 0;
 					double Start2 = FPlatformTime::Seconds();
@@ -80,14 +80,13 @@ void ATerrainGenerator::StartBuildingTerrain() {
 						TInstanceMeshTypeMap ObjectMap;
 
 						TMeshDataPtr Md = nullptr;
-						if (Vd->getDensityFillState() == TVoxelDataFillState::MIXED) {
-							TInstanceMeshTypeMap ObjectMap;						
-							Md = GenerateMesh(Vd);
-							GetTerrainGenerator()->GenerateInstanceObjects(ZoneIndex, Vd, ObjectMap);
-						}
+						//if (Vd->getDensityFillState() == TVoxelDataFillState::MIXED) {
+							//TInstanceMeshTypeMap ObjectMap;						
+							//Md = GenerateMesh(Vd);
+							//GetTerrainGenerator()->GenerateInstanceObjects(ZoneIndex, Vd, ObjectMap);
+						//}
 
-						//FIXME force save
-						//ForceSaveVd(ZoneIndex, Vd);
+						ForceSave(ZoneIndex, Vd, Md, ObjectMap);
 						delete Vd;
 
 						ProgressGenerationPipeline(FinishedZonesCount, T);
@@ -98,9 +97,9 @@ void ATerrainGenerator::StartBuildingTerrain() {
 
 					double End2 = FPlatformTime::Seconds();
 					double Time2 = (End2 - Start2) * 1000;
-					UE_LOG(LogTemp, Log, TEXT("test ----> %f ms"), Time2);
+					//UE_LOG(LogTemp, Log, TEXT(" ----> %f ms"), Time2);
 
-					GetTerrainGenerator()->Clean();
+					//GetTerrainGenerator()->Clean(); // TODO generator
 					NewVdBatchList.Empty();
 					IdxB++;
 				}

@@ -4,7 +4,6 @@
 
 #include "UnrealSandboxTerrain.h"
 #include "TerrainController.h"
-#include "SandboxTerrainGenerator.h"
 
 #include "SandboxObject.h"
 #include "DrawDebugHelpers.h"
@@ -89,15 +88,9 @@ private:
 //======================================================================================================================================================================
 
 
-class TCudaTerrainGenerator : public TDefaultTerrainGenerator {
-	//using TDefaultTerrainGenerator::TDefaultTerrainGenerator;
+class UCudaTerrainGeneratorComponent : public UTerrainGeneratorComponent {
 
 public:
-
-
-	TCudaTerrainGenerator(ASandboxTerrainController* Controller) : TDefaultTerrainGenerator(Controller) {
-
-	};
 
 	//==========================================
 	// Terrain density and material 
@@ -382,7 +375,7 @@ protected:
 			UE_LOG(LogTemp, Log, TEXT("CudaResult -> %d ----> %f ms"), CudaResult, Time);
 
 		} else {
-			TDefaultTerrainGenerator::BatchGenerateComplexVd(GenPass2List);
+			UTerrainGeneratorComponent::BatchGenerateComplexVd(GenPass2List);
 		}
 	}
 
@@ -391,8 +384,10 @@ protected:
 	}
 };
 
-TBaseTerrainGenerator* ATerrainController::NewTerrainGenerator() {
- 	return new TCudaTerrainGenerator(this);
+
+UTerrainGeneratorComponent* ATerrainController::NewTerrainGenerator() {
+	return NewObject<UCudaTerrainGeneratorComponent>(this, TEXT("TerrainGenerator"));
+	//return Super::NewTerrainGenerator();
 }
 
 void ATerrainController::OnOverlapActorDuringTerrainEdit(const FHitResult& OverlapResult, const FVector& Pos) {
