@@ -6,6 +6,12 @@
 #include "LevelController.h"
 #include "TerrainController.generated.h"
 
+
+struct TVdGenBlock;
+
+typedef int(*PCudaGetInfo)();
+typedef int(*PCudaGenerateVd)(TVdGenBlock*);
+
 /**
  * 
  */

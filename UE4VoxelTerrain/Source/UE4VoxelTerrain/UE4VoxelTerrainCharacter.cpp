@@ -8,7 +8,6 @@
 #include "DrawDebugHelpers.h"
 #include "SandboxTerrainController.h"
 #include "UE4VoxelTerrainPlayerController.h"
-#include "VoxelDualContouringMeshComponent.h"
 
 #include <cmath>
 

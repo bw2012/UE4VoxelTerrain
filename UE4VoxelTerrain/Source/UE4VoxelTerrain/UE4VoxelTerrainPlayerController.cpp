@@ -5,7 +5,6 @@
 #include "SandboxTerrainController.h"
 #include "SandboxCharacter.h"
 #include "VoxelIndex.h"
-#include "VoxelDualContouringMeshComponent.h"
 
 #include "SpawnHelper.hpp"
 
