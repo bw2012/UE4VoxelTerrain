@@ -44,8 +44,6 @@ protected:
 
 	virtual UTerrainGeneratorComponent* NewTerrainGenerator() override;
 
-	virtual void BatchGenerateNewVd(const TArray<TSpawnZoneParam>& GenerationList, TArray<TVoxelData*>& NewVdArray) override;
-
 	virtual void OnOverlapActorDuringTerrainEdit(const FHitResult& OverlapResult, const FVector& Pos) override;
 
 private:

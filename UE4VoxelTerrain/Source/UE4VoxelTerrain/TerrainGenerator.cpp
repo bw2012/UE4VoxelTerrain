@@ -64,8 +64,9 @@ void ATerrainGenerator::StartBuildingTerrain() {
 					//UE_LOG(LogTemp, Log, TEXT("batch %d / %d"), IdxB, MaxBatchCount);
 
 
-					TArray<TVoxelData*> NewVdArray;
-					BatchGenerateNewVd(NewVdBatchList, NewVdArray);
+					TArray<TGenerateZoneResult> NewVdArray;
+					//BatchGenerateNewVd(NewVdBatchList, NewVdArray);
+					GetTerrainGenerator()->BatchGenerateVoxelTerrain(NewVdBatchList, NewVdArray);
 
 					double End = FPlatformTime::Seconds();
 					double Time = (End - Start) * 1000;
@@ -75,6 +76,7 @@ void ATerrainGenerator::StartBuildingTerrain() {
 
 					int Idx2 = 0;
 					double Start2 = FPlatformTime::Seconds();
+					/*
 					for (TVoxelData* Vd : NewVdArray) {
 						const TVoxelIndex& ZoneIndex = NewVdBatchList[Idx2].Index;
 						TInstanceMeshTypeMap ObjectMap;
@@ -94,6 +96,7 @@ void ATerrainGenerator::StartBuildingTerrain() {
 						Idx2++;
 						FinishedZonesCount++;
 					}
+					*/
 
 					double End2 = FPlatformTime::Seconds();
 					double Time2 = (End2 - Start2) * 1000;

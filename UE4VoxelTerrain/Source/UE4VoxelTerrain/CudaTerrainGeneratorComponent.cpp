@@ -83,6 +83,7 @@ void UCudaTerrainGeneratorComponent::BeginPlay() {
 
 bool UCudaTerrainGeneratorComponent::ForcePerformZone(const TVoxelIndex& ZoneIndex) {
 	// cave level z=3000 ~ ZoneIndex.Z = 3 +- 1
+	/*
 	if (ZoneIndex.Z <= -2 && ZoneIndex.Z >= -4) {
 		return true;
 	}
@@ -90,6 +91,7 @@ bool UCudaTerrainGeneratorComponent::ForcePerformZone(const TVoxelIndex& ZoneInd
 	if (ZoneIndex.X == 0 && ZoneIndex.Y == 0 && ZoneIndex.Z == -1) {
 		return true;
 	}
+	*/
 
 	return false;
 }
@@ -111,6 +113,7 @@ float UCudaTerrainGeneratorComponent::DensityFunctionExt(float Density, const TV
 		return Result;
 	}
 
+	/*
 	if (ZoneIndex.Z <= -2 && ZoneIndex.Z >= -4) {
 		float Result = Density;
 
@@ -178,6 +181,9 @@ float UCudaTerrainGeneratorComponent::DensityFunctionExt(float Density, const TV
 	} else {
 		return Density;
 	}
+	*/
+
+	return Density;
 }
 
 //==========================================
@@ -297,7 +303,8 @@ bool UCudaTerrainGeneratorComponent::SpawnCustomFoliage(const TVoxelIndex& Index
 
 				AsyncTask(ENamedThreads::GameThread, [=]() {
 					World->SpawnActor(Obj->ClassDefaultObject->GetClass(), &Transform);
-					});
+				});
+
 				return false;
 			}
 		}

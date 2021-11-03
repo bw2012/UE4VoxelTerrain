@@ -77,7 +77,8 @@ void AMiningTool::OnAltAction(const FHitResult& Hit, ABaseCharacter* Owner) {
 			}
 		}
 
-		//UE_LOG(LogSandboxTerrain, Log, TEXT("zIndex -> %f %f %f"), ZoneIndexTmp.X, ZoneIndexTmp.Y, ZoneIndexTmp.Z);
+		UE_LOG(LogTemp, Log, TEXT("Test -> %f %f %f"), Hit.Location.X, Hit.Location.Y, Hit.Location.Z);
+		UE_LOG(LogTemp, Log, TEXT("ZoneIndex -> %f %f %f"), ZoneIndexTmp.X, ZoneIndexTmp.Y, ZoneIndexTmp.Z);
 
 		if (DiggingToolMode == 0) {
 			Terrain->DigTerrainRoundHole(Hit.ImpactPoint, 80, 5);

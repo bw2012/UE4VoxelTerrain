@@ -44,11 +44,6 @@ void ATerrainController::OnOverlapActorDuringTerrainEdit(const FHitResult& Overl
 	}
 }
 
-
-void ATerrainController::BatchGenerateNewVd(const TArray<TSpawnZoneParam>& GenerationList, TArray<TVoxelData*>& NewVdArray) {
-	Super::BatchGenerateNewVd(GenerationList, NewVdArray);
-}
-
 bool ATerrainController::IsUseCuda() {
 	if (CudaGenVdPtr && bUseCUDAGenerator) {
 		return true;
@@ -56,7 +51,6 @@ bool ATerrainController::IsUseCuda() {
 
 	return false;
 }
-
 
 void ATerrainController::BeginPlay() {
 	if (bUseCUDAGenerator) {
