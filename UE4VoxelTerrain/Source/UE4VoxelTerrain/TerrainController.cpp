@@ -37,9 +37,9 @@ UTerrainGeneratorComponent* ATerrainController::NewTerrainGenerator() {
 void ATerrainController::OnOverlapActorDuringTerrainEdit(const FHitResult& OverlapResult, const FVector& Pos) {
 	ASandboxObject* Object = Cast<ASandboxObject>(OverlapResult.GetActor());
 	if (Object) {
-		UStaticMeshComponent* RootComponent = Cast<UStaticMeshComponent>(Object->GetRootComponent());
-		if (RootComponent) {
-			//RootComponent->SetSimulatePhysics(true);
+		UStaticMeshComponent* Component = Cast<UStaticMeshComponent>(Object->GetRootComponent());
+		if (Component) {
+			//Component->SetSimulatePhysics(true);
 		}
 	}
 }

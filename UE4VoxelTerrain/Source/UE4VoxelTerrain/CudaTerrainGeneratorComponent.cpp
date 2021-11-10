@@ -83,15 +83,16 @@ void UCudaTerrainGeneratorComponent::BeginPlay() {
 
 bool UCudaTerrainGeneratorComponent::ForcePerformZone(const TVoxelIndex& ZoneIndex) {
 	// cave level z=3000 ~ ZoneIndex.Z = 3 +- 1
+	
 	/*
 	if (ZoneIndex.Z <= -2 && ZoneIndex.Z >= -4) {
 		return true;
 	}
+	*/
 
 	if (ZoneIndex.X == 0 && ZoneIndex.Y == 0 && ZoneIndex.Z == -1) {
 		return true;
 	}
-	*/
 
 	return false;
 }
@@ -297,12 +298,12 @@ bool UCudaTerrainGeneratorComponent::SpawnCustomFoliage(const TVoxelIndex& Index
 				float ScaleZ = Rnd.FRandRange(FoliageType.ScaleMaxZ, FoliageType.ScaleMaxZ * 2);
 				FVector Scale = FVector(ScaleZ, ScaleZ, ScaleZ);
 				FRotator Rotation(Pitch, Roll, Yaw);
-				FTransform Transform(Rotation, Pos, Scale);
+				FTransform NewTransform(Rotation, Pos, Scale);
 
 				UWorld* World = TerrainController->GetWorld();
 
 				AsyncTask(ENamedThreads::GameThread, [=]() {
-					World->SpawnActor(Obj->ClassDefaultObject->GetClass(), &Transform);
+					World->SpawnActor(Obj->ClassDefaultObject->GetClass(), &NewTransform);
 				});
 
 				return false;
