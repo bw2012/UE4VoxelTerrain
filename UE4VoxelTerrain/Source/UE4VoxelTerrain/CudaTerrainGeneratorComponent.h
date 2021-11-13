@@ -17,8 +17,6 @@ public:
 
 	void BeginPlay() override;
 
-	virtual bool ForcePerformZone(const TVoxelIndex& ZoneIndex) override;
-
 	virtual float DensityFunctionExt(float Density, const TVoxelIndex& ZoneIndex, const FVector& WorldPos, const FVector& LocalPos) const override;
 
 	virtual bool UseCustomFoliage(const TVoxelIndex& ZoneIndex) override;
@@ -32,5 +30,13 @@ protected:
 	virtual void BatchGenerateComplexVd(TArray<TGenerateVdTempItm>& GenPass2List) override;
 
 	virtual void OnBatchGenerationFinished() override;
+
+	virtual bool IsForcedComplexZone(const TVoxelIndex& ZoneIndex) override;
+
+	void virtual PrepareMetaData() override;
+
+private:
+
+	float MakeBox(const FVector& P, const FBox& InBox) const;
 
 };

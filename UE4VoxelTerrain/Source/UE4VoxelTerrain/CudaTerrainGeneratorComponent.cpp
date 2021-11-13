@@ -74,14 +74,23 @@ private:
 
 void UCudaTerrainGeneratorComponent::BeginPlay() {
 	Super::BeginPlay();
-	UE_LOG(LogTemp, Warning, TEXT(" UCudaTerrainGeneratorComponent::BeginPlay"));
+	UE_LOG(LogTemp, Warning, TEXT("UCudaTerrainGeneratorComponent::BeginPlay"));
 }
 
 //==========================================
 // Terrain density and material 
 //==========================================
 
-bool UCudaTerrainGeneratorComponent::ForcePerformZone(const TVoxelIndex& ZoneIndex) {
+# define TEST_A 415
+
+void UCudaTerrainGeneratorComponent::PrepareMetaData() {
+	UE_LOG(LogTemp, Warning, TEXT("UCudaTerrainGeneratorComponent::PrepareMetaData()"));
+
+	TZoneStructureHandler Str;
+	AddZoneStructure(TVoxelIndex(0,0,-3), Str);
+}
+
+bool UCudaTerrainGeneratorComponent::IsForcedComplexZone(const TVoxelIndex& ZoneIndex) {
 	// cave level z=3000 ~ ZoneIndex.Z = 3 +- 1
 	
 	/*
@@ -91,11 +100,76 @@ bool UCudaTerrainGeneratorComponent::ForcePerformZone(const TVoxelIndex& ZoneInd
 	*/
 
 	if (ZoneIndex.X == 0 && ZoneIndex.Y == 0 && ZoneIndex.Z == -1) {
-		return true;
+		//return true;
 	}
 
-	return false;
+	return Super::IsForcedComplexZone(ZoneIndex);
 }
+
+float UCudaTerrainGeneratorComponent::MakeBox(const FVector& P, const FBox& InBox) const {
+
+	const float ExtendXP = InBox.Max.X;
+	const float ExtendYP = InBox.Max.Y;
+	const float ExtendZP = InBox.Max.Z;
+
+	const float ExtendXN = InBox.Min.X;
+	const float ExtendYN = InBox.Min.Y;
+	const float ExtendZN = InBox.Min.Z;
+
+	static const float E = 50;
+	FBox Box = InBox.ExpandBy(E);
+
+	static float D = 100;
+	static const float NoisePositionScale = 0.005f;
+	static const float NoiseValueScale = 0.1;
+	float R = 1;
+
+	if (FMath::PointBoxIntersection(P, Box)) {
+		R = 0;
+
+		if (FMath::Abs(P.X - ExtendXP) < 50 || FMath::Abs(-P.X + ExtendXN) < 50) {
+			//AsyncTask(ENamedThreads::GameThread, [=]() { DrawDebugPoint(GetWorld(), LocalPos, 3.f, FColor(255, 255, 0, 0), true); });
+			const float DensityXP = 1 / (1 + exp((ExtendXP - P.X) / D));
+			const float DensityXN = 1 / (1 + exp((-ExtendXN + P.X) / D));
+			const float DensityX = (DensityXP + DensityXN);
+			const float N = PerlinNoise(P, NoisePositionScale, NoiseValueScale);
+			R = DensityX + N;
+		}
+
+		if (FMath::Abs(P.Y - ExtendYP) < 50 || FMath::Abs(-P.Y + ExtendYN) < 50) {
+			if (R < 0.5f) {
+				//AsyncTask(ENamedThreads::GameThread, [=]() { DrawDebugPoint(GetWorld(), LocalPos, 2.f, FColor(255, 255, 255, 0), true); });
+				const float DensityYP = 1 / (1 + exp((ExtendYP - P.Y) / D));
+				const float DensityYN = 1 / (1 + exp((-ExtendYN + P.Y) / D));
+				const float DensityY = (DensityYP + DensityYN);
+				const float N = PerlinNoise(P, NoisePositionScale, NoiseValueScale);
+				R = DensityY + N;
+			}
+		}
+
+		if (FMath::Abs(P.Z - ExtendZP) < 50 || FMath::Abs(-P.Z + ExtendZN) < 50) {
+			if (R < 0.5f) {
+				//AsyncTask(ENamedThreads::GameThread, [=]() { DrawDebugPoint(GetWorld(), LocalPos, 2.f, FColor(255, 255, 255, 0), true); });
+				const float DensityZP = 1 / (1 + exp((ExtendZP - P.Z) / D));
+				const float DensityZN = 1 / (1 + exp((-ExtendZN + P.Z) / D));
+				const float DensityZ = (DensityZP + DensityZN);
+				const float N = PerlinNoise(P, NoisePositionScale, NoiseValueScale / 2);
+				R = DensityZ + N;
+
+			}
+		}
+	}
+
+	if (R > 1) {
+		R = 1;
+	}
+
+	if (R < 0) {
+		R = 0;
+	}
+
+	return R;
+};
 
 float UCudaTerrainGeneratorComponent::DensityFunctionExt(float Density, const TVoxelIndex& ZoneIndex, const FVector& WorldPos, const FVector& LocalPos) const {
 
@@ -108,10 +182,20 @@ float UCudaTerrainGeneratorComponent::DensityFunctionExt(float Density, const TV
 		float t = 1 - exp(-pow(r, 2) / (MaxR * 100));
 
 		//float D = 1 / (1 + exp((r - MaxR) / 10));
-
-		Result *= t;
+		//Result *= t;
 
 		return Result;
+	}
+
+	if (ZoneIndex.X == 0 && ZoneIndex.Y == 0 && ZoneIndex.Z == -3) {
+		const float ExtendX = TEST_A;
+		const float ExtendY = TEST_A;
+		const float ExtendZ = TEST_A;
+
+		FVector Min(-ExtendX, -ExtendY, -ExtendZ);
+		FVector Max(ExtendX, ExtendY, ExtendZ);
+		FBox Box(Min, Max);
+		return MakeBox(LocalPos, Box);
 	}
 
 	/*
