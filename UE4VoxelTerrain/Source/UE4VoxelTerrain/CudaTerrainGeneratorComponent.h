@@ -35,8 +35,12 @@ protected:
 
 	void virtual PrepareMetaData() override;
 
+	virtual void PostGenerateNewInstanceObjects(const TVoxelIndex& ZoneIndex, const TVoxelData* Vd, TInstanceMeshTypeMap& ZoneInstanceMeshMap) const override;
+
 private:
 
-	float MakeBox(const FVector& P, const FBox& InBox) const;
+	float FunctionMakeBox(const float InDensity, const FVector& P, const FBox& InBox) const;
+
+	float FunctionMakeCaveLayer(float Density, const FVector& WorldPos) const;
 
 };

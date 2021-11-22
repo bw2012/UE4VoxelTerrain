@@ -29,6 +29,15 @@ public:
 	UPROPERTY(EditAnywhere, Category = "UnrealSandbox Toolkit")
 	ALevelController* LevelController;
 
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "On Progress Save Voxel Terrain"))
+	void OnProgressSaveTerrain(float Progress);
+
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "On Finish Save Voxel Terrain"))
+	void OnFinishSaveTerrain();
+
+	UFUNCTION(BlueprintCallable, Category = "UnrealSandbox")
+	void ShutdownAndSaveMap();
+
 
 public:
 

@@ -35,6 +35,8 @@ typedef struct TVdGenBlock {
 
 #define TotalCacheSize 299593
 
+static const float CaveLayerZ = 7000.f;
+
 
 class TVdGenBlockCuda {
 
@@ -81,37 +83,72 @@ void UCudaTerrainGeneratorComponent::BeginPlay() {
 // Terrain density and material 
 //==========================================
 
-# define TEST_A 415
+bool IsCaveLayerZone(float Z) {
+	static constexpr int const ZoneCaveLevel = -(CaveLayerZ / 1000);
+	return Z <= ZoneCaveLevel + 1 && Z >= ZoneCaveLevel - 1;
+}
 
 void UCudaTerrainGeneratorComponent::PrepareMetaData() {
 	UE_LOG(LogTemp, Warning, TEXT("UCudaTerrainGeneratorComponent::PrepareMetaData()"));
 
+	const int Len = 15;
+
+	const FVector O(0, 0, -3000);
+	const float ExtendX = ((Len * 1000) / 2) - 100; //1400
+	const float ExtendY = 400;
+	const float ExtendZ = 400;
+
+	FVector Min(O.X - ExtendX, O.Y - ExtendY, O.Z - ExtendZ);
+	FVector Max(O.X + ExtendX, O.Y + ExtendY, O.Z + ExtendZ);
+	FBox Box(Min, Max);
+
 	TZoneStructureHandler Str;
-	AddZoneStructure(TVoxelIndex(0,0,-3), Str);
+	Str.Function = [=](float InDensity, const TVoxelIndex& VoxelIndex, const FVector& LocalPos, const FVector& WorldPos) {
+		const float Density = FunctionMakeBox(InDensity, WorldPos, Box);
+		const TMaterialId MaterialId = 4;
+		return std::make_tuple(Density, MaterialId);
+	};
+
+	int X = -(Len / 2) ;
+	for (auto I = 0; I < Len; I++) {
+		AddZoneStructure(TVoxelIndex(X, 0, -3), Str);
+		X++;
+	}
+
+
+	const float ExtendX2 = 400; 
+	const float ExtendY2 = ((Len * 1000) / 2) - 100;
+	const float ExtendZ2 = 400;
+
+	FVector Min2(O.X - ExtendX2, O.Y - ExtendY2, O.Z - ExtendZ2);
+	FVector Max2(O.X + ExtendX2, O.Y + ExtendY2, O.Z + ExtendZ2);
+	FBox Box2(Min2, Max2);
+	TZoneStructureHandler Str2;
+	Str2.Function = [=](float InDensity, const TVoxelIndex& VoxelIndex, const FVector& LocalPos, const FVector& WorldPos) {
+		const float Density = FunctionMakeBox(InDensity, WorldPos, Box2);
+		const TMaterialId MaterialId = 4;
+		return std::make_tuple(Density, MaterialId);
+	};
+
+	int Y = -(Len / 2);
+	for (auto I = 0; I < Len; I++) {
+		AddZoneStructure(TVoxelIndex(0, Y, -3), Str2);
+		Y++;
+	}
 }
 
 bool UCudaTerrainGeneratorComponent::IsForcedComplexZone(const TVoxelIndex& ZoneIndex) {
-	// cave level z=3000 ~ ZoneIndex.Z = 3 +- 1
-	
-	/*
-	if (ZoneIndex.Z <= -2 && ZoneIndex.Z >= -4) {
+	if (IsCaveLayerZone(ZoneIndex.Z)) {
 		return true;
 	}
-	*/
-
-	if (ZoneIndex.X == 0 && ZoneIndex.Y == 0 && ZoneIndex.Z == -1) {
-		//return true;
-	}
-
+	
 	return Super::IsForcedComplexZone(ZoneIndex);
 }
 
-float UCudaTerrainGeneratorComponent::MakeBox(const FVector& P, const FBox& InBox) const {
-
+float UCudaTerrainGeneratorComponent::FunctionMakeBox(const float InDensity, const FVector& P, const FBox& InBox) const {
 	const float ExtendXP = InBox.Max.X;
 	const float ExtendYP = InBox.Max.Y;
 	const float ExtendZP = InBox.Max.Z;
-
 	const float ExtendXN = InBox.Min.X;
 	const float ExtendYN = InBox.Min.Y;
 	const float ExtendZN = InBox.Min.Z;
@@ -122,23 +159,25 @@ float UCudaTerrainGeneratorComponent::MakeBox(const FVector& P, const FBox& InBo
 	static float D = 100;
 	static const float NoisePositionScale = 0.005f;
 	static const float NoiseValueScale = 0.1;
-	float R = 1;
+	float R = InDensity;
+
+	if (InDensity < 0.5) {
+		return InDensity;
+	}
 
 	if (FMath::PointBoxIntersection(P, Box)) {
 		R = 0;
 
 		if (FMath::Abs(P.X - ExtendXP) < 50 || FMath::Abs(-P.X + ExtendXN) < 50) {
-			//AsyncTask(ENamedThreads::GameThread, [=]() { DrawDebugPoint(GetWorld(), LocalPos, 3.f, FColor(255, 255, 0, 0), true); });
-			const float DensityXP = 1 / (1 + exp((ExtendXP - P.X) / D));
-			const float DensityXN = 1 / (1 + exp((-ExtendXN + P.X) / D));
-			const float DensityX = (DensityXP + DensityXN);
-			const float N = PerlinNoise(P, NoisePositionScale, NoiseValueScale);
-			R = DensityX + N;
+				const float DensityXP = 1 / (1 + exp((ExtendXP - P.X) / D));
+				const float DensityXN = 1 / (1 + exp((-ExtendXN + P.X) / D));
+				const float DensityX = (DensityXP + DensityXN);
+				const float N = PerlinNoise(P, NoisePositionScale, NoiseValueScale);
+				R = DensityX + N;
 		}
 
 		if (FMath::Abs(P.Y - ExtendYP) < 50 || FMath::Abs(-P.Y + ExtendYN) < 50) {
 			if (R < 0.5f) {
-				//AsyncTask(ENamedThreads::GameThread, [=]() { DrawDebugPoint(GetWorld(), LocalPos, 2.f, FColor(255, 255, 255, 0), true); });
 				const float DensityYP = 1 / (1 + exp((ExtendYP - P.Y) / D));
 				const float DensityYN = 1 / (1 + exp((-ExtendYN + P.Y) / D));
 				const float DensityY = (DensityYP + DensityYN);
@@ -149,7 +188,6 @@ float UCudaTerrainGeneratorComponent::MakeBox(const FVector& P, const FBox& InBo
 
 		if (FMath::Abs(P.Z - ExtendZP) < 50 || FMath::Abs(-P.Z + ExtendZN) < 50) {
 			if (R < 0.5f) {
-				//AsyncTask(ENamedThreads::GameThread, [=]() { DrawDebugPoint(GetWorld(), LocalPos, 2.f, FColor(255, 255, 255, 0), true); });
 				const float DensityZP = 1 / (1 + exp((ExtendZP - P.Z) / D));
 				const float DensityZN = 1 / (1 + exp((-ExtendZN + P.Z) / D));
 				const float DensityZ = (DensityZP + DensityZN);
@@ -171,6 +209,74 @@ float UCudaTerrainGeneratorComponent::MakeBox(const FVector& P, const FBox& InBo
 	return R;
 };
 
+
+float UCudaTerrainGeneratorComponent::FunctionMakeCaveLayer(float Density, const FVector& WorldPos) const {
+	const float BaseCaveLevel = CaveLayerZ;
+
+	float Result = Density;
+
+	static const float scale0 = 0.005f; // small
+	static const float scale1 = 0.001f; // small
+	static const float scale2 = 0.0003f; // big
+
+	const FVector v0(WorldPos.X * scale0, WorldPos.Y * scale0, WorldPos.Z * 0.0002); // Stalactite
+	const FVector v1(WorldPos.X * scale1, WorldPos.Y * scale1, WorldPos.Z * scale1); // just noise
+	//const FVector v2(WorldPos.X * scale2, WorldPos.Y *scale2, WorldPos.Z * scale2); // just noise big
+	const float Noise0 = PerlinNoise(v0);
+	const float Noise1 = PerlinNoise(v1);
+	//const float Noise2 = PerlinNoise(v2);
+	//const float Noise2 = PerlinNoise(v2);
+
+	//const FVector v4(WorldPos.X * scale3, WorldPos.Y * scale3, 10); // extra cave level
+	//const float Noise4 = PerlinNoise(v4);
+
+	//float NormalizedPerlin = (NoiseMedium + 0.87) / 1.73;
+	//float Z = WorldPos.Z + NoiseMedium * 100;
+	//float DensityByGroundLevel = 1 - (1 / (1 + exp(-Z)));
+
+	// cave height
+	static const float scale3 = 0.001f;
+	const FVector v3(WorldPos.X * scale3, WorldPos.Y * scale3, 0); // extra cave height
+	const float Noise3 = PerlinNoise(v3);
+	const float BaseCaveHeight = 400;
+	const float ExtraCaveHeight = 490 * Noise3;
+	float CaveHeight = BaseCaveHeight + ExtraCaveHeight;
+	//float CaveHeight = BaseCaveHeight;
+	if (CaveHeight < 0) {
+		CaveHeight = 0; // protection if my calculation is failed
+	}
+
+	//cave level
+	static const float scale4 = 0.00025f;
+	const FVector v4(WorldPos.X * scale4, WorldPos.Y * scale4, 10); // extra cave height
+	const float Noise4 = PerlinNoise(v4);
+	const float ExtraCaveLevel = 1000 * Noise4;
+	const float CaveLevel = BaseCaveLevel + ExtraCaveLevel;
+
+	// cave layer function
+	const float CaveHeightF = CaveHeight * 160; // 80000 -> 473
+	float CaveLayer = 1 - exp(-pow((WorldPos.Z + CaveLevel), 2) / CaveHeightF); // 80000 -> 473 = 473 * 169.13
+
+	if (WorldPos.Z < -(BaseCaveLevel - 1200) && WorldPos.Z > -(BaseCaveLevel + 1200)) {
+		const float CaveLayerN = 1 - CaveLayer;
+		//Result *= CaveLayer + CaveLayerN * Noise0 * 0.5 + Noise1 * 0.75 + Noise2 * 0.5;
+		Result *= CaveLayer + CaveLayerN * Noise0 * 0.5 + Noise1 * 0.75;
+		//Result *= CaveLayer;
+	}
+
+	//Result = Density * (NoiseMedium * 0.5 + t);
+
+	if (Result < 0) {
+		Result = 0;
+	}
+
+	if (Result > 1) {
+		Result = 1;
+	}
+
+	return Result;
+}
+
 float UCudaTerrainGeneratorComponent::DensityFunctionExt(float Density, const TVoxelIndex& ZoneIndex, const FVector& WorldPos, const FVector& LocalPos) const {
 
 	if (ZoneIndex.X == 0 && ZoneIndex.Y == 0 && ZoneIndex.Z == -1) {
@@ -187,86 +293,23 @@ float UCudaTerrainGeneratorComponent::DensityFunctionExt(float Density, const TV
 		return Result;
 	}
 
+	/*
 	if (ZoneIndex.X == 0 && ZoneIndex.Y == 0 && ZoneIndex.Z == -3) {
-		const float ExtendX = TEST_A;
-		const float ExtendY = TEST_A;
-		const float ExtendZ = TEST_A;
+		const float ExtendX = 400;
+		const float ExtendY = 400;
+		const float ExtendZ = 400;
 
 		FVector Min(-ExtendX, -ExtendY, -ExtendZ);
 		FVector Max(ExtendX, ExtendY, ExtendZ);
 		FBox Box(Min, Max);
-		return MakeBox(LocalPos, Box);
-	}
-
-	/*
-	if (ZoneIndex.Z <= -2 && ZoneIndex.Z >= -4) {
-		float Result = Density;
-
-		static const float scale0 = 0.005f; // small
-		static const float scale1 = 0.001f; // small
-		static const float scale2 = 0.0003f; // big
-
-		const FVector v0(WorldPos.X * scale0, WorldPos.Y * scale0, WorldPos.Z * 0.0002); // Stalactite
-		const FVector v1(WorldPos.X * scale1, WorldPos.Y * scale1, WorldPos.Z * scale1); // just noise
-		//const FVector v2(WorldPos.X * scale2, WorldPos.Y *scale2, WorldPos.Z * scale2); // just noise big
-		const float Noise0 = PerlinNoise(v0);
-		const float Noise1 = PerlinNoise(v1);
-		//const float Noise2 = PerlinNoise(v2);
-		//const float Noise2 = PerlinNoise(v2);
-
-		//const FVector v4(WorldPos.X * scale3, WorldPos.Y * scale3, 10); // extra cave level
-		//const float Noise4 = PerlinNoise(v4);
-
-		//float NormalizedPerlin = (NoiseMedium + 0.87) / 1.73;
-		//float Z = WorldPos.Z + NoiseMedium * 100;
-		//float DensityByGroundLevel = 1 - (1 / (1 + exp(-Z)));
-
-		// cave height
-		static const float scale3 = 0.001f;
-		const FVector v3(WorldPos.X * scale3, WorldPos.Y * scale3, 0); // extra cave height
-		const float Noise3 = PerlinNoise(v3);
-		const float BaseCaveHeight = 400;
-		const float ExtraCaveHeight = 490 * Noise3;
-		float CaveHeight = BaseCaveHeight + ExtraCaveHeight;
-		//float CaveHeight = BaseCaveHeight;
-		if (CaveHeight < 0) {
-			CaveHeight = 0; // protection if my calculation is failed
-		}
-
-		//cave level
-		static const float scale4 = 0.00025f;
-		const FVector v4(WorldPos.X * scale4, WorldPos.Y * scale4, 10); // extra cave height
-		const float Noise4 = PerlinNoise(v4);
-		const float BaseCaveLevel = 3000;
-		const float ExtraCaveLevel = 1000 * Noise4;
-		const float CaveLevel = BaseCaveLevel + ExtraCaveLevel;
-
-		// cave layer function
-		const float CaveHeightF = CaveHeight * 160; // 80000 -> 473
-		float CaveLayer = 1 - exp(-pow((WorldPos.Z + CaveLevel), 2) / CaveHeightF); // 80000 -> 473 = 473 * 169.13
-
-		if (WorldPos.Z < -1800 && WorldPos.Z > -4200) {
-			const float CaveLayerN = 1 - CaveLayer;
-			//Result *= CaveLayer + CaveLayerN * Noise0 * 0.5 + Noise1 * 0.75 + Noise2 * 0.5;
-			Result *= CaveLayer + CaveLayerN * Noise0 * 0.5 + Noise1 * 0.75;
-			//Result *= CaveLayer;
-		}
-
-		//Result = Density * (NoiseMedium * 0.5 + t);
-
-		if (Result < 0) {
-			Result = 0;
-		}
-
-		if (Result > 1) {
-			Result = 1;
-		}
-
-		return Result;
-	} else {
-		return Density;
+		return FunctionMakeBox(LocalPos, Box);
 	}
 	*/
+
+	
+	if (IsCaveLayerZone(ZoneIndex.Z)) {
+		return FunctionMakeCaveLayer(Density, WorldPos);
+	}
 
 	return Density;
 }
@@ -312,8 +355,8 @@ FSandboxFoliage UCudaTerrainGeneratorComponent::FoliageExt(const int32 FoliageTy
 				T = 0.2;
 			}
 
-			Foliage.ScaleMaxZ *= T;
-			Foliage.ScaleMinZ = 0.3;
+			//Foliage.ScaleMaxZ *= T;
+			//Foliage.ScaleMinZ = 0.3;
 		}
 	}
 
@@ -329,10 +372,49 @@ FSandboxFoliage UCudaTerrainGeneratorComponent::FoliageExt(const int32 FoliageTy
 }
 
 
-bool UCudaTerrainGeneratorComponent::SpawnCustomFoliage(const TVoxelIndex& Index, const FVector& WorldPos, int32 FoliageTypeId, FSandboxFoliage FoliageType, FRandomStream& Rnd, FTransform& Transform) {
+void UCudaTerrainGeneratorComponent::PostGenerateNewInstanceObjects(const TVoxelIndex& ZoneIndex, const TVoxelData* Vd, TInstanceMeshTypeMap& ZoneInstanceMeshMap) const {
+	FVector ZonePos = Vd->getOrigin();
+	if (ZonePos.Z > -3000) {
+		return;
+	}
 
 	ATerrainController* TerrainController = (ATerrainController*)GetController();
 	ALevelController* LevelController = TerrainController->LevelController;
+
+	if (!LevelController) {
+		return;
+	}
+
+	int32 Hash = ZoneHash(ZonePos);
+	FRandomStream Rnd = FRandomStream();
+	Rnd.Initialize(Hash);
+	Rnd.Reset();
+
+	FVector Pos(0);
+	FVector Normal(0);
+	TSubclassOf<ASandboxObject> Obj = LevelController->GetSandboxObjectByClassId(300);
+	if (SelectRandomSpawnPoint(Rnd, ZoneIndex, Vd, Pos, Normal)) {
+		FVector Scale = FVector(1, 1, 1);
+		FRotator Rotation = Normal.Rotation();
+		Rotation.Pitch -= 90;
+		FTransform NewTransform(Rotation, Pos, Scale);
+		UWorld* World = TerrainController->GetWorld();
+		AsyncTask(ENamedThreads::GameThread, [=]() {
+			World->SpawnActor(Obj->ClassDefaultObject->GetClass(), &NewTransform);
+		});
+	}
+}
+
+
+bool UCudaTerrainGeneratorComponent::SpawnCustomFoliage(const TVoxelIndex& Index, const FVector& WorldPos, int32 FoliageTypeId, FSandboxFoliage FoliageType, FRandomStream& Rnd, FTransform& Transform) {
+
+	/*
+	ATerrainController* TerrainController = (ATerrainController*)GetController();
+	ALevelController* LevelController = TerrainController->LevelController;
+
+	if (!LevelController) {
+		return false;
+	}
 
 	FVector Pos = WorldPos;
 
@@ -374,24 +456,22 @@ bool UCudaTerrainGeneratorComponent::SpawnCustomFoliage(const TVoxelIndex& Index
 
 		float Probability = FoliageType.Probability;
 		if (Chance <= Probability / 20) {
-			if (LevelController) {
-				TSubclassOf<ASandboxObject> Obj = LevelController->GetSandboxObjectByClassId(200);
-				float Pitch = Rnd.FRandRange(0.f, 10.f);
-				float Roll = Rnd.FRandRange(0.f, 360.f);
-				float Yaw = Rnd.FRandRange(0.f, 10.f);
-				float ScaleZ = Rnd.FRandRange(FoliageType.ScaleMaxZ, FoliageType.ScaleMaxZ * 2);
-				FVector Scale = FVector(ScaleZ, ScaleZ, ScaleZ);
-				FRotator Rotation(Pitch, Roll, Yaw);
-				FTransform NewTransform(Rotation, Pos, Scale);
+			TSubclassOf<ASandboxObject> Obj = LevelController->GetSandboxObjectByClassId(200);
+			float Pitch = Rnd.FRandRange(0.f, 10.f);
+			float Roll = Rnd.FRandRange(0.f, 360.f);
+			float Yaw = Rnd.FRandRange(0.f, 10.f);
+			float ScaleZ = Rnd.FRandRange(FoliageType.ScaleMaxZ, FoliageType.ScaleMaxZ * 2);
+			FVector Scale = FVector(ScaleZ, ScaleZ, ScaleZ);
+			FRotator Rotation(Pitch, Roll, Yaw);
+			FTransform NewTransform(Rotation, Pos, Scale);
 
-				UWorld* World = TerrainController->GetWorld();
+			UWorld* World = TerrainController->GetWorld();
 
-				AsyncTask(ENamedThreads::GameThread, [=]() {
-					World->SpawnActor(Obj->ClassDefaultObject->GetClass(), &NewTransform);
-				});
+			AsyncTask(ENamedThreads::GameThread, [=]() {
+				World->SpawnActor(Obj->ClassDefaultObject->GetClass(), &NewTransform);
+			});
 
-				return false;
-			}
+			return false;
 		}
 
 		if (Chance <= Probability) {
@@ -402,6 +482,7 @@ bool UCudaTerrainGeneratorComponent::SpawnCustomFoliage(const TVoxelIndex& Index
 			return true;
 		}
 	}
+	*/
 
 	return false;
 }
