@@ -37,10 +37,12 @@ protected:
 
 	virtual void PostGenerateNewInstanceObjects(const TVoxelIndex& ZoneIndex, const TVoxelData* Vd, TInstanceMeshTypeMap& ZoneInstanceMeshMap) const override;
 
-private:
+public:
 
 	float FunctionMakeBox(const float InDensity, const FVector& P, const FBox& InBox) const;
 
 	float FunctionMakeCaveLayer(float Density, const FVector& WorldPos) const;
+
+	float FunctionMakeVerticalCylinder(const float InDensity, const FVector& V, const FVector& Origin, const float Radius, const float Top, const float Bottom) const;
 
 };

@@ -63,10 +63,8 @@ void AUE4VoxelTerrainPlayerController::PlayerTick(float DeltaTime) {
 			SandboxEnvironment->UpdatePlayerPosition(Location);
 			if (SandboxEnvironment) {
 				if (Location.Z < -500) {
-					//UE_LOG(LogSandboxTerrain, Log, TEXT("SetCaveMode = true"));
 					SandboxEnvironment->SetCaveMode(true);
 				} else {
-					//UE_LOG(LogSandboxTerrain, Log, TEXT("SetCaveMode = false"));
 					SandboxEnvironment->SetCaveMode(false);
 				}
 			}

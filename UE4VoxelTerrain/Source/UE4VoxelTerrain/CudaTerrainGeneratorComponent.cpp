@@ -79,71 +79,138 @@ void UCudaTerrainGeneratorComponent::BeginPlay() {
 	UE_LOG(LogTemp, Warning, TEXT("UCudaTerrainGeneratorComponent::BeginPlay"));
 }
 
-//==========================================
-// Terrain density and material 
-//==========================================
+//====================================================================================
+// Terrain density and material generator
+//====================================================================================
 
 bool IsCaveLayerZone(float Z) {
 	static constexpr int const ZoneCaveLevel = -(CaveLayerZ / 1000);
 	return Z <= ZoneCaveLevel + 1 && Z >= ZoneCaveLevel - 1;
 }
 
+void StructureHotizontalBoxTunnel(UCudaTerrainGeneratorComponent* Generator, const FBox TunnelBox) {
+	const auto Function = [=](const float InDensity, const TMaterialId InMaterialId, const TVoxelIndex& VoxelIndex, const FVector& LocalPos, const FVector& WorldPos) {
+		const float Density = Generator->FunctionMakeBox(InDensity, WorldPos, TunnelBox);
+		const TMaterialId MaterialId = InMaterialId;
+		return std::make_tuple(Density, MaterialId);
+	};
+
+	TZoneStructureHandler Str;
+	Str.Function = Function;
+	Str.Box = TunnelBox;
+
+	const TVoxelIndex MinIndex = Generator->GetController()->GetZoneIndex(TunnelBox.Min);
+	const TVoxelIndex MaxIndex = Generator->GetController()->GetZoneIndex(TunnelBox.Max);
+
+	for (auto X = MinIndex.X; X <= MaxIndex.X; X++) {
+		for (auto Y = MinIndex.Y; Y <= MaxIndex.Y; Y++) {
+			Generator->AddZoneStructure(TVoxelIndex(X, Y, MinIndex.Z), Str);
+		}
+	}
+}
+
+void StructureVerticalCylinderTunnel(UCudaTerrainGeneratorComponent* Generator, const FVector& Origin, const float Radius, const float Top, const float Bottom) {
+	const auto Function = [=](const float InDensity, const TMaterialId InMaterialId, const TVoxelIndex& VoxelIndex, const FVector& LocalPos, const FVector& WorldPos) {
+		const float Density = Generator->FunctionMakeVerticalCylinder(InDensity, WorldPos, Origin, 300.f, 2000.f, -3000.f);
+		return std::make_tuple(Density, InMaterialId);
+	};
+
+	const auto Function2 = [=](const TVoxelIndex& ZoneIndex, const FVector& WorldPos, const FVector& LocalPos) {
+		const FVector P = WorldPos - Origin;
+		const float R = std::sqrt(P.X * P.X + P.Y * P.Y);
+		if (R < Radius) {
+			return false;
+		}
+		return true;
+	};
+
+	TZoneStructureHandler Str;
+	Str.Function = Function;
+	Str.LandscapeFoliageHandler = Function2;
+	Str.Pos = Origin;
+
+	FVector Min(Origin);
+	Min.Z += Bottom;
+
+	FVector Max(Origin);
+	Max.Z += Top;
+
+	const TVoxelIndex MinIndex = Generator->GetController()->GetZoneIndex(Min);
+	const TVoxelIndex MaxIndex = Generator->GetController()->GetZoneIndex(Max);
+
+	for (auto Z = MinIndex.Z; Z <= MaxIndex.Z; Z++) {
+		Generator->AddZoneStructure(TVoxelIndex(MinIndex.X, MinIndex.Y, Z), Str);
+	}
+
+}
+
+
 void UCudaTerrainGeneratorComponent::PrepareMetaData() {
 	UE_LOG(LogTemp, Warning, TEXT("UCudaTerrainGeneratorComponent::PrepareMetaData()"));
 
-	const int Len = 15;
-
 	const FVector O(0, 0, -3000);
-	const float ExtendX = ((Len * 1000) / 2) - 100; //1400
-	const float ExtendY = 400;
-	const float ExtendZ = 400;
-
-	FVector Min(O.X - ExtendX, O.Y - ExtendY, O.Z - ExtendZ);
-	FVector Max(O.X + ExtendX, O.Y + ExtendY, O.Z + ExtendZ);
+	const float Len = (23 * 1000) - 200; //1400
+	const float Width = 800;
+	const float Height = 800;
+	const FVector Min(O.X - Len / 2, O.Y - Width / 2, O.Z - Height / 2);
+	const FVector Max(O.X + Len / 2, O.Y + Width / 2, O.Z + Height / 2);
 	FBox Box(Min, Max);
 
-	TZoneStructureHandler Str;
-	Str.Function = [=](float InDensity, const TVoxelIndex& VoxelIndex, const FVector& LocalPos, const FVector& WorldPos) {
-		const float Density = FunctionMakeBox(InDensity, WorldPos, Box);
-		const TMaterialId MaterialId = 4;
-		return std::make_tuple(Density, MaterialId);
-	};
+	StructureHotizontalBoxTunnel(this, Box);
+	StructureHotizontalBoxTunnel(this, Box.MoveTo(O + FVector(0.f, 5000.f, 0.f)));
+	StructureHotizontalBoxTunnel(this, Box.MoveTo(O + FVector(0.f, -5000.f, 0.f)));
+	StructureHotizontalBoxTunnel(this, Box.MoveTo(O + FVector(0.f, 10000.f, 0.f)));
+	StructureHotizontalBoxTunnel(this, Box.MoveTo(O + FVector(0.f, -10000.f, 0.f)));
 
-	int X = -(Len / 2) ;
-	for (auto I = 0; I < Len; I++) {
-		AddZoneStructure(TVoxelIndex(X, 0, -3), Str);
-		X++;
-	}
-
-
-	const float ExtendX2 = 400; 
-	const float ExtendY2 = ((Len * 1000) / 2) - 100;
-	const float ExtendZ2 = 400;
-
-	FVector Min2(O.X - ExtendX2, O.Y - ExtendY2, O.Z - ExtendZ2);
-	FVector Max2(O.X + ExtendX2, O.Y + ExtendY2, O.Z + ExtendZ2);
+	const FVector Min2(O.X - Width / 2, O.Y - Len / 2, O.Z - Height / 2);
+	const FVector Max2(O.X + Width / 2, O.Y + Len / 2, O.Z + Height / 2);
 	FBox Box2(Min2, Max2);
-	TZoneStructureHandler Str2;
-	Str2.Function = [=](float InDensity, const TVoxelIndex& VoxelIndex, const FVector& LocalPos, const FVector& WorldPos) {
-		const float Density = FunctionMakeBox(InDensity, WorldPos, Box2);
-		const TMaterialId MaterialId = 4;
-		return std::make_tuple(Density, MaterialId);
-	};
+	StructureHotizontalBoxTunnel(this, Box2);
+	StructureHotizontalBoxTunnel(this, Box2.MoveTo(O + FVector(10000.f, 0.f, 0.f)));
+	StructureHotizontalBoxTunnel(this, Box2.MoveTo(O + FVector(-10000.f, 0.f, 0.f)));
 
-	int Y = -(Len / 2);
-	for (auto I = 0; I < Len; I++) {
-		AddZoneStructure(TVoxelIndex(0, Y, -3), Str2);
-		Y++;
-	}
+	StructureVerticalCylinderTunnel(this, FVector(1000, 0, 0), 300.f, 0.f, -3000.f);
 }
 
 bool UCudaTerrainGeneratorComponent::IsForcedComplexZone(const TVoxelIndex& ZoneIndex) {
 	if (IsCaveLayerZone(ZoneIndex.Z)) {
-		return true;
+		//return true;
 	}
 	
+	if (ZoneIndex.X == 1 && ZoneIndex.Y == 0) {
+		//return true;
+	}
+
 	return Super::IsForcedComplexZone(ZoneIndex);
 }
+
+float UCudaTerrainGeneratorComponent::FunctionMakeVerticalCylinder(const float InDensity, const FVector& V, const FVector& Origin, const float Radius, const float Top, const float Bottom) const {
+	static const float E = 50;
+	static const float NoisePositionScale = 0.007f;
+	static const float NoiseValueScale = 0.1;
+
+	if (InDensity > 0.5f) {
+		if (V.Z < Top + E && V.Z > Bottom - E) {
+			const FVector P = V - Origin;
+			const float R = std::sqrt(P.X * P.X + P.Y * P.Y);
+			if (R < Radius + E) {
+				if (R < Radius - E) {
+					return 0.f;
+				} else {
+					//AsyncTask(ENamedThreads::GameThread, [=]() { DrawDebugPoint(GetWorld(), V, 2.f, FColor(255, 255, 255, 0), true); });
+
+					const float N = PerlinNoise(P, NoisePositionScale, NoiseValueScale);
+					float Density = 1 / (1 + exp((Radius - R) / 100)) + N;
+					if (Density < InDensity) {
+						return Density;
+					}
+				}
+			}
+		}
+	}
+
+	return InDensity;
+};
 
 float UCudaTerrainGeneratorComponent::FunctionMakeBox(const float InDensity, const FVector& P, const FBox& InBox) const {
 	const float ExtendXP = InBox.Max.X;
@@ -161,7 +228,7 @@ float UCudaTerrainGeneratorComponent::FunctionMakeBox(const float InDensity, con
 	static const float NoiseValueScale = 0.1;
 	float R = InDensity;
 
-	if (InDensity < 0.5) {
+	if (InDensity < 0.5f) {
 		return InDensity;
 	}
 
@@ -293,22 +360,8 @@ float UCudaTerrainGeneratorComponent::DensityFunctionExt(float Density, const TV
 		return Result;
 	}
 
-	/*
-	if (ZoneIndex.X == 0 && ZoneIndex.Y == 0 && ZoneIndex.Z == -3) {
-		const float ExtendX = 400;
-		const float ExtendY = 400;
-		const float ExtendZ = 400;
-
-		FVector Min(-ExtendX, -ExtendY, -ExtendZ);
-		FVector Max(ExtendX, ExtendY, ExtendZ);
-		FBox Box(Min, Max);
-		return FunctionMakeBox(LocalPos, Box);
-	}
-	*/
-
-	
 	if (IsCaveLayerZone(ZoneIndex.Z)) {
-		return FunctionMakeCaveLayer(Density, WorldPos);
+		//return FunctionMakeCaveLayer(Density, WorldPos);
 	}
 
 	return Density;
@@ -373,6 +426,10 @@ FSandboxFoliage UCudaTerrainGeneratorComponent::FoliageExt(const int32 FoliageTy
 
 
 void UCudaTerrainGeneratorComponent::PostGenerateNewInstanceObjects(const TVoxelIndex& ZoneIndex, const TVoxelData* Vd, TInstanceMeshTypeMap& ZoneInstanceMeshMap) const {
+	if (Vd->getDensityFillState() != TVoxelDataFillState::MIXED) {
+		return;
+	}
+
 	FVector ZonePos = Vd->getOrigin();
 	if (ZonePos.Z > -3000) {
 		return;

@@ -8,7 +8,7 @@
 
 
 FString USystemInfoWidget::SandboxVersionInfoText() {
-	return TEXT("v0.0.13-pre-alpha");
+	return TEXT("v0.0.14-pre-alpha");
 }
 
 
