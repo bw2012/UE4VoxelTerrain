@@ -44,7 +44,9 @@ public:
 
 	TVdGenBlockCuda(int size) {
 		vdGenBlk.size = size;
-		int vd_full_num = USBT_ZONE_DIMENSION * USBT_ZONE_DIMENSION * USBT_ZONE_DIMENSION;
+		const uint32 ZoneVoxelResolution = 65; //FIXME
+
+		int vd_full_num = ZoneVoxelResolution * ZoneVoxelResolution * ZoneVoxelResolution;
 
 		vdGenBlk.vd_size = vd_full_num * sizeof(TDensityVal) * size;
 		vdGenBlk.md_size = vd_full_num * sizeof(TMaterialId) * size;
@@ -561,7 +563,8 @@ void UCudaTerrainGeneratorComponent::BatchGenerateComplexVd(TArray<TGenerateVdTe
 		TVdGenBlock* vdGenBlk = VdGenBlockCuda.GetVdGenBlock();
 
 		int i = 0;
-		const static int s = USBT_ZONE_DIMENSION * USBT_ZONE_DIMENSION * USBT_ZONE_DIMENSION;
+		//const uint32 ZoneVoxelResolution = 65; //FIXME
+		const static int s = ZoneVoxelResolution * ZoneVoxelResolution * ZoneVoxelResolution;
 		for (const auto& P : GenPass2List) {
 			FVector Pos = Controller->GetZonePos(P.ZoneIndex);
 			vdGenBlk->zoneData[i].x = Pos.X;
