@@ -12,7 +12,7 @@ This plugin provides tools to generate, visualize and in-game change volume terr
 ![Cave](https://github.com/bw2012/UE4VoxelTerrain/blob/master/cave.gif?raw=true)
 
 # Download playable demo
-UE5 version: [UE5VoxelTerrain-0.0.30.zip](https://cutt.ly/wNy34W5) 
+UE5 version: [UE5VoxelTerrain-0.0.31.zip](https://cutt.ly/fN6BVpr) 
 
 UE4 version: [UE4VoxelTerrain-0.0.23.zip](https://bit.ly/3v4F13A) 
 
