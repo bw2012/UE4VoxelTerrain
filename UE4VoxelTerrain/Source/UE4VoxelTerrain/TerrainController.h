@@ -53,8 +53,6 @@ protected:
 
 	virtual UTerrainGeneratorComponent* NewTerrainGenerator() override;
 
-	virtual void OnOverlapActorDuringTerrainEdit(const FHitResult& OverlapResult, const FVector& Pos) override;
-
 private:
 
 	void* CudaGenDllHandle = nullptr;

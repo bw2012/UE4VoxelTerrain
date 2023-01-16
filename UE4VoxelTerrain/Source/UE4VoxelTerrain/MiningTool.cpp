@@ -81,7 +81,7 @@ void AMiningTool::OnAltAction(const FHitResult& Hit, ABaseCharacter* Owner) {
 		UE_LOG(LogTemp, Log, TEXT("ZoneIndex -> %f %f %f"), ZoneIndexTmp.X, ZoneIndexTmp.Y, ZoneIndexTmp.Z);
 
 		if (DiggingToolMode == 0) {
-			Terrain->DigTerrainRoundHole(Hit.ImpactPoint, 80, 5);
+			Terrain->DigTerrainRoundHole(Hit.ImpactPoint, 80, true);
 			if (Owner->GetSandboxPlayerView() == PlayerView::TOP_DOWN) {
 				//GetWorld()->GetTimerManager().SetTimer(Timer, this, &AUE4VoxelTerrainPlayerController::PerformAction, 0.1, true);
 			}

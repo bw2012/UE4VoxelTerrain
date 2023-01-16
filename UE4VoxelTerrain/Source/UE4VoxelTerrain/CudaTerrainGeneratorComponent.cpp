@@ -91,58 +91,11 @@ bool IsCaveLayerZone(float Z) {
 }
 
 void StructureHotizontalBoxTunnel(UCudaTerrainGeneratorComponent* Generator, const FBox TunnelBox) {
-	const auto Function = [=](const float InDensity, const TMaterialId InMaterialId, const TVoxelIndex& VoxelIndex, const FVector& LocalPos, const FVector& WorldPos) {
-		const float Density = Generator->FunctionMakeBox(InDensity, WorldPos, TunnelBox);
-		const TMaterialId MaterialId = InMaterialId;
-		return std::make_tuple(Density, MaterialId);
-	};
 
-	TZoneStructureHandler Str;
-	Str.Function = Function;
-	Str.Box = TunnelBox;
-
-	const TVoxelIndex MinIndex = Generator->GetController()->GetZoneIndex(TunnelBox.Min);
-	const TVoxelIndex MaxIndex = Generator->GetController()->GetZoneIndex(TunnelBox.Max);
-
-	for (auto X = MinIndex.X; X <= MaxIndex.X; X++) {
-		for (auto Y = MinIndex.Y; Y <= MaxIndex.Y; Y++) {
-			Generator->AddZoneStructure(TVoxelIndex(X, Y, MinIndex.Z), Str);
-		}
-	}
 }
 
 void StructureVerticalCylinderTunnel(UCudaTerrainGeneratorComponent* Generator, const FVector& Origin, const float Radius, const float Top, const float Bottom) {
-	const auto Function = [=](const float InDensity, const TMaterialId InMaterialId, const TVoxelIndex& VoxelIndex, const FVector& LocalPos, const FVector& WorldPos) {
-		const float Density = Generator->FunctionMakeVerticalCylinder(InDensity, WorldPos, Origin, 300.f, 2000.f, -3000.f);
-		return std::make_tuple(Density, InMaterialId);
-	};
 
-	const auto Function2 = [=](const TVoxelIndex& ZoneIndex, const FVector& WorldPos, const FVector& LocalPos) {
-		const FVector P = WorldPos - Origin;
-		const float R = std::sqrt(P.X * P.X + P.Y * P.Y);
-		if (R < Radius) {
-			return false;
-		}
-		return true;
-	};
-
-	TZoneStructureHandler Str;
-	Str.Function = Function;
-	Str.LandscapeFoliageHandler = Function2;
-	Str.Pos = Origin;
-
-	FVector Min(Origin);
-	Min.Z += Bottom;
-
-	FVector Max(Origin);
-	Max.Z += Top;
-
-	const TVoxelIndex MinIndex = Generator->GetController()->GetZoneIndex(Min);
-	const TVoxelIndex MaxIndex = Generator->GetController()->GetZoneIndex(Max);
-
-	for (auto Z = MinIndex.Z; Z <= MaxIndex.Z; Z++) {
-		Generator->AddZoneStructure(TVoxelIndex(MinIndex.X, MinIndex.Y, Z), Str);
-	}
 
 }
 
@@ -373,14 +326,6 @@ float UCudaTerrainGeneratorComponent::DensityFunctionExt(float Density, const TV
 // Foliage (mushrooms)
 //==========================================
 
-bool UCudaTerrainGeneratorComponent::UseCustomFoliage(const TVoxelIndex& ZoneIndex) {
-	if (ZoneIndex.Z <= -2 && ZoneIndex.Z >= -4) {
-		return true;
-	}
-
-	return false;
-}
-
 FSandboxFoliage UCudaTerrainGeneratorComponent::FoliageExt(const int32 FoliageTypeId, const FSandboxFoliage& FoliageType, const TVoxelIndex& ZoneIndex, const FVector& WorldPos) {
 	FSandboxFoliage Foliage = FoliageType;
 
@@ -424,126 +369,6 @@ FSandboxFoliage UCudaTerrainGeneratorComponent::FoliageExt(const int32 FoliageTy
 	}
 
 	return Foliage;
-}
-
-
-void UCudaTerrainGeneratorComponent::PostGenerateNewInstanceObjects(const TVoxelIndex& ZoneIndex, const TVoxelData* Vd, TInstanceMeshTypeMap& ZoneInstanceMeshMap) const {
-	if (Vd->getDensityFillState() != TVoxelDataFillState::MIXED) {
-		return;
-	}
-
-	FVector ZonePos = Vd->getOrigin();
-	if (ZonePos.Z > -3000) {
-		return;
-	}
-
-	ATerrainController* TerrainController = (ATerrainController*)GetController();
-	ALevelController* LevelController = TerrainController->LevelController;
-
-	if (!LevelController) {
-		return;
-	}
-
-	int32 Hash = ZoneHash(ZonePos);
-	FRandomStream Rnd = FRandomStream();
-	Rnd.Initialize(Hash);
-	Rnd.Reset();
-
-	FVector Pos(0);
-	FVector Normal(0);
-	TSubclassOf<ASandboxObject> Obj = LevelController->GetSandboxObjectByClassId(300);
-	if (SelectRandomSpawnPoint(Rnd, ZoneIndex, Vd, Pos, Normal)) {
-		FVector Scale = FVector(1, 1, 1);
-		FRotator Rotation = Normal.Rotation();
-		Rotation.Pitch -= 90;
-		FTransform NewTransform(Rotation, Pos, Scale);
-		UWorld* World = TerrainController->GetWorld();
-		AsyncTask(ENamedThreads::GameThread, [=]() {
-			World->SpawnActor(Obj->ClassDefaultObject->GetClass(), &NewTransform);
-		});
-	}
-}
-
-
-bool UCudaTerrainGeneratorComponent::SpawnCustomFoliage(const TVoxelIndex& Index, const FVector& WorldPos, int32 FoliageTypeId, FSandboxFoliage FoliageType, FRandomStream& Rnd, FTransform& Transform) {
-
-	/*
-	ATerrainController* TerrainController = (ATerrainController*)GetController();
-	ALevelController* LevelController = TerrainController->LevelController;
-
-	if (!LevelController) {
-		return false;
-	}
-
-	FVector Pos = WorldPos;
-
-	// cave height
-	static const float scale3 = 0.001f;
-	const FVector v3(WorldPos.X * scale3, WorldPos.Y * scale3, 0); // extra cave height
-	const float Noise3 = PerlinNoise(v3);
-	const float BaseCaveHeight = 400;
-	const float ExtraCaveHeight = 490 * Noise3;
-	float CaveHeight = BaseCaveHeight + ExtraCaveHeight;
-	//float CaveHeight = BaseCaveHeight;
-	if (CaveHeight < 0) {
-		CaveHeight = 0; // protection if my calculation is failed
-	}
-
-	//cave level
-	static const float scale4 = 0.00025f;
-	const FVector v4(WorldPos.X * scale4, WorldPos.Y * scale4, 10); // extra cave height
-	const float Noise4 = PerlinNoise(v4);
-	const float BaseCaveLevel = 3000;
-	const float ExtraCaveLevel = 1000 * Noise4;
-	const float CaveLevel = BaseCaveLevel + ExtraCaveLevel;
-
-	static const float scale1 = 0.001f; // small
-	const FVector v1(WorldPos.X * scale1, WorldPos.Y * scale1, 0); // just noise
-	const float Noise1 = PerlinNoise(v1);
-
-	float test = (-CaveLevel - CaveHeight / 2);
-	if (WorldPos.Z < test - 200 && WorldPos.Z > test - 220) { // && WorldPos.Z > test - 105
-		//FVector rrr = WorldPos;
-		//rrr.Z += 10;
-		//if (Noise1 > 0) {
-		//	Foliage.Probability = 0;
-		//}
-
-
-		float Chance = Rnd.FRandRange(0.f, 1.f);
-		Pos.Z += 20;
-
-		float Probability = FoliageType.Probability;
-		if (Chance <= Probability / 20) {
-			TSubclassOf<ASandboxObject> Obj = LevelController->GetSandboxObjectByClassId(200);
-			float Pitch = Rnd.FRandRange(0.f, 10.f);
-			float Roll = Rnd.FRandRange(0.f, 360.f);
-			float Yaw = Rnd.FRandRange(0.f, 10.f);
-			float ScaleZ = Rnd.FRandRange(FoliageType.ScaleMaxZ, FoliageType.ScaleMaxZ * 2);
-			FVector Scale = FVector(ScaleZ, ScaleZ, ScaleZ);
-			FRotator Rotation(Pitch, Roll, Yaw);
-			FTransform NewTransform(Rotation, Pos, Scale);
-
-			UWorld* World = TerrainController->GetWorld();
-
-			AsyncTask(ENamedThreads::GameThread, [=]() {
-				World->SpawnActor(Obj->ClassDefaultObject->GetClass(), &NewTransform);
-			});
-
-			return false;
-		}
-
-		if (Chance <= Probability) {
-			float Angle = Rnd.FRandRange(0.f, 360.f);
-			float ScaleZ = Rnd.FRandRange(FoliageType.ScaleMinZ, FoliageType.ScaleMaxZ);
-			FVector Scale = FVector(ScaleZ, ScaleZ, ScaleZ);
-			Transform = FTransform(FRotator(0, Angle, 0), Pos, Scale);
-			return true;
-		}
-	}
-	*/
-
-	return false;
 }
 
 void UCudaTerrainGeneratorComponent::BatchGenerateComplexVd(TArray<TGenerateVdTempItm>& GenPass2List) {

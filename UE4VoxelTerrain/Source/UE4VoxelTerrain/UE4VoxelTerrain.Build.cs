@@ -6,7 +6,10 @@ public class UE4VoxelTerrain : ModuleRules
 {
 	public UE4VoxelTerrain(ReadOnlyTargetRules Target) : base(Target)
     {
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "UnrealSandboxTerrain", "UnrealSandboxToolkit" });
+        bUseRTTI = true;
+        CppStandard = CppStandardVersion.Latest;
+
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "UnrealSandboxTerrain", "UnrealSandboxToolkit" });
 	}
 
 

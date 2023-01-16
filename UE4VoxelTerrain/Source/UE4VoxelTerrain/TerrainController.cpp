@@ -34,16 +34,6 @@ UTerrainGeneratorComponent* ATerrainController::NewTerrainGenerator() {
 	return CudaGenerator;
 }
 
-void ATerrainController::OnOverlapActorDuringTerrainEdit(const FHitResult& OverlapResult, const FVector& Pos) {
-	ASandboxObject* Object = Cast<ASandboxObject>(OverlapResult.GetActor());
-	if (Object) {
-		UStaticMeshComponent* Component = Cast<UStaticMeshComponent>(Object->GetRootComponent());
-		if (Component) {
-			//Component->SetSimulatePhysics(true);
-		}
-	}
-}
-
 bool ATerrainController::IsUseCuda() {
 	if (CudaGenVdPtr && bUseCUDAGenerator) {
 		return true;
@@ -99,25 +89,5 @@ void ATerrainController::EndPlay(const EEndPlayReason::Type EndPlayReason) {
 }
 
 void ATerrainController::ShutdownAndSaveMap() {
-	ShutdownThreads();
 
-	UE_LOG(LogTemp, Log, TEXT("Start save terrain manual"));
-	RunThread([&]() {
-
-		std::function<void(uint32, uint32)> OnProgress = [=](uint32 Processed, uint32 Total) {
-			if (Processed == Total) {
-				AsyncTask(ENamedThreads::GameThread, [=]() { OnProgressSaveTerrain(1.f); });
-			} else if (Processed % 10 == 0) {
-				float Progress = (float)Processed / (float)Total;
-				UE_LOG(LogTemp, Log, TEXT("Save terrain: %d / %d - %f%%"), Processed, Total, Progress);
-				AsyncTask(ENamedThreads::GameThread, [=]() { OnProgressSaveTerrain(Progress); });
-			}
-		};
-
-		std::function<void(uint32)> OnFinish = [=](uint32 Processed) {
-			AsyncTask(ENamedThreads::GameThread, [=]() { OnFinishSaveTerrain(); });
-		};
-
-		Save(OnProgress, OnFinish);
-	});
 }

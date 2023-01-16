@@ -34,7 +34,6 @@ public:
 
 protected:
 
-	virtual void BeginTerrainLoad() override;
 
 private:
 

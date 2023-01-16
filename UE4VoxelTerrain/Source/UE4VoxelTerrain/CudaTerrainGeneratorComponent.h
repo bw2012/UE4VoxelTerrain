@@ -19,11 +19,7 @@ public:
 
 	virtual float DensityFunctionExt(float Density, const TVoxelIndex& ZoneIndex, const FVector& WorldPos, const FVector& LocalPos) const override;
 
-	virtual bool UseCustomFoliage(const TVoxelIndex& ZoneIndex) override;
-
 	virtual FSandboxFoliage FoliageExt(const int32 FoliageTypeId, const FSandboxFoliage & FoliageType, const TVoxelIndex & ZoneIndex, const FVector & WorldPos) override;
-
-	virtual bool SpawnCustomFoliage(const TVoxelIndex& Index, const FVector& WorldPos, int32 FoliageTypeId, FSandboxFoliage FoliageType, FRandomStream& Rnd, FTransform& Transform) override;
 
 protected:
 
@@ -35,7 +31,6 @@ protected:
 
 	void virtual PrepareMetaData() override;
 
-	virtual void PostGenerateNewInstanceObjects(const TVoxelIndex& ZoneIndex, const TVoxelData* Vd, TInstanceMeshTypeMap& ZoneInstanceMeshMap) const override;
 
 public:
 
