@@ -2,23 +2,26 @@
 Unreal Engine 4 procedural voxel terrian example (partially based on Transvoxel™ Algorithm by Eric Lengyel http://transvoxel.org/)
 This plugin provides tools to generate, visualize and in-game change volume terrain using voxels.
 
-**Master branch tested with Unreal Engine 4.27.1 [Windows 10]**
-**Work in progress**
-
 ![Unreal Engine 4 voxel terrian](https://github.com/bw2012/UE4VoxelTerrain/blob/master/terrain.gif?raw=true)
 
 ![Grass](https://github.com/bw2012/UE4VoxelTerrain/blob/master/grass.gif?raw=true)
 
 ![Cave](https://github.com/bw2012/UE4VoxelTerrain/blob/master/cave.gif?raw=true)
 
-# Download playable demo
-UE5 version: [UE5VoxelTerrain-0.0.38.zip](https://cutt.ly/z2yhLnA) 
+Master branch tested with Unreal Engine 4.27.1 [Windows 10]
 
-UE4 version: [UE4VoxelTerrain-0.0.23.zip](https://bit.ly/3v4F13A) 
+**This version is discontinued due to UE5 release**
+
+**Please use UE5 version.**
 
 # UE5 version source code
 
 https://github.com/bw2012/UE5VoxelTerrainDemo
+
+# Download playable demo
+UE5 version: [UE5VoxelTerrain-0.0.38.zip](https://cutt.ly/z2yhLnA) 
+
+UE4 version: [UE4VoxelTerrain-0.0.23.zip](https://bit.ly/3v4F13A) 
 
 # Features
 * Runtime terrain modification
