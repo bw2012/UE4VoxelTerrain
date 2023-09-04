@@ -10,9 +10,8 @@ This plugin provides tools to generate, visualize and in-game change volume terr
 
 Master branch tested with Unreal Engine 4.27.1 [Windows 10]
 
-**This version is discontinued due to UE5 release**
-
-**Please use UE5 version.**
+> [!WARNING]  
+> This version is discontinued due to UE5 release. Please use UE5 version.
 
 # UE5 version source code
 
