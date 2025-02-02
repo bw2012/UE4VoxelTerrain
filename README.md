@@ -18,7 +18,7 @@ Master branch tested with Unreal Engine 4.27.1 [Windows 10]
 https://github.com/bw2012/UE5VoxelTerrainDemo
 
 # Download playable demo
-UE5 version: [UE5VoxelTerrain-0.0.38.zip](https://drive.google.com/file/d/1s6FRtKYhyXROCsA0Ga8atbiszyskr82A/view) 
+UE5 version: [UE5VoxelTerrain-0.0.39.zip](https://mega.nz/file/mKoSQDTD#H9zhTK-HGyCfolQuhSGCJ-jOSXfA_IlOsWVU5xPTAgU) 
 
 UE4 version: [UE4VoxelTerrain-0.0.23.zip](https://drive.google.com/file/d/1pg1EYWWtyAS4ZwLdQvE-DJOJOVZPjj8v/view) 
 
